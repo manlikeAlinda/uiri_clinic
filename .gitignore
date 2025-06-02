@@ -1,0 +1,41 @@
+# CodeIgniter specific
+/application/cache/*
+!/application/cache/index.html
+
+/application/logs/*
+!/application/logs/index.html
+
+# Environment
+.env
+.env.*
+
+# Composer vendor directory
+/vendor/
+
+/node_modules/
+
+# IDEs and Editors
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Other common
+*.log
+*.bak
+*.swp
+*.tmp
+*.sqlite
+
+# PHPUnit and testing
+phpunit.xml
+phpunit.xml.dist
+/build/
+coverage.xml
+.phpunit.result.cache
+
+# Uploaded files (optional, depending on your app)
+uploads/
