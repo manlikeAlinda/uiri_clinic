@@ -51,13 +51,7 @@ $routes->post('patients/store', 'PatientController::store');
 $routes->post('patients/update', 'PatientController::update');
 $routes->post('patients/delete', 'PatientController::delete');
 
-$routes->get('visits', 'VisitController::index');
-$routes->post('visits/store', 'VisitController::store');
-$routes->post('visits/update', 'VisitController::update');
+$routes->get('visits',         'VisitController::index');
+$routes->post('visits/store',  'VisitController::store');
+$routes->post('visits/update/(:num)', 'VisitController::update/$1');
 $routes->post('visits/delete', 'VisitController::delete');
-$routes->post('visits/addDetails', 'VisitController::addDetails');
-$routes->post('visits/updateDetails', 'VisitController::updateDetails');
-$routes->get('visits/details/(:num)', 'VisitController::getDetails/$1');
-
-
-

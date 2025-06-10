@@ -49,6 +49,7 @@
                             <th>Gender</th>
                             <th>Contact Info</th>
                             <th>Next of Kin Contact</th>
+                            <th>Next of Kin Relationship</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -61,6 +62,7 @@
                                 <td><?= esc($patient['gender']) ?></td>
                                 <td><?= esc($patient['contact_info']) ?></td>
                                 <td><?= esc($patient['next_of_kin_contact']) ?></td>
+                                <td><?= esc($patient['next_of_kin_relationship']) ?></td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         <button type="button"
@@ -74,9 +76,8 @@
                                             data-dob="<?= esc($patient['date_of_birth']) ?>"
                                             data-gender="<?= esc($patient['gender']) ?>"
                                             data-contact_info="<?= esc($patient['contact_info']) ?>"
-                                            data-weight="<?= esc($patient['weight']) ?>"
-                                            data-medical_history="<?= esc($patient['medical_history']) ?>"
-                                            data-next_of_kin="<?= esc($patient['next_of_kin_contact']) ?>">
+                                            data-next_of_kin_contact="<?= esc($patient['next_of_kin_contact']) ?>"
+                                            data-next_of_kin_relationship="<?= esc($patient['next_of_kin_relationship']) ?>">
                                             <iconify-icon icon="mdi:eye-outline" class="text-white text-lg"></iconify-icon>
                                         </button>
 
@@ -91,10 +92,8 @@
                                             data-dob="<?= esc($patient['date_of_birth']) ?>"
                                             data-gender="<?= esc($patient['gender']) ?>"
                                             data-contact_info="<?= esc($patient['contact_info']) ?>"
-                                            data-weight="<?= esc($patient['weight']) ?>"
-
-                                            data-medical_history="<?= esc($patient['medical_history']) ?>"
-                                            data-next_of_kin="<?= esc($patient['next_of_kin_contact']) ?>">
+                                            data-next_of_kin_contact="<?= esc($patient['next_of_kin_contact']) ?>"
+                                            data-next_of_kin_relationship="<?= esc($patient['next_of_kin_relationship']) ?>">
                                             <iconify-icon icon="mdi:pencil-outline" class="text-white text-lg"></iconify-icon>
                                         </button>
 
@@ -108,8 +107,6 @@
                                         </button>
                                     </div>
                                 </td>
-
-
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -117,6 +114,7 @@
             </div>
         </div>
 
+        <!-- Add Patient Modal -->
         <!-- Add Patient Modal -->
         <div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -128,24 +126,49 @@
                         </div>
                         <div class="modal-body">
                             <div class="row g-3">
-                                <div class="col-12"><label>First Name</label><input type="text" name="first_name" class="form-control" required></div>
-                                <div class="col-12"><label>Last Name</label><input type="text" name="last_name" class="form-control" required></div>
-                                <div class="col-12"><label>Date of Birth</label><input type="date" name="date_of_birth" class="form-control" required></div>
-                                <div class="col-12"><label>Gender</label>
+                                <div class="col-md-6">
+                                    <label>First Name</label>
+                                    <input type="text" name="first_name" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Last Name</label>
+                                    <input type="text" name="last_name" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Date of Birth</label>
+                                    <input type="date" name="date_of_birth" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Gender</label>
                                     <select name="gender" class="form-select" required>
                                         <option value="">Select</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
                                 </div>
-                                <div class="col-12">
-                                    <label>Weight (kg)</label>
-                                    <input type="number" step="1" name="weight" class="form-control">
+                                <div class="col-md-6">
+                                    <label>Contact Info</label>
+                                    <input type="text" name="contact_info" class="form-control">
                                 </div>
-
-                                <div class="col-12"><label>Contact Info</label><input type="text" name="contact_info" class="form-control"></div>
-                                <div class="col-12"><label>Medical History</label><textarea name="medical_history" class="form-control" rows="2"></textarea></div>
-                                <div class="col-12"><label>Next of Kin Contact</label><input type="text" name="next_of_kin_contact" class="form-control"></div>
+                                <div class="col-md-6">
+                                    <label>Next of Kin Contact</label>
+                                    <input type="text" name="next_of_kin_contact" class="form-control">
+                                </div>
+                                <div class="col-md-12">
+                                    <label>Next of Kin Relationship</label>
+                                    <select name="next_of_kin_relationship" class="form-select" required>
+                                        <option value="">Select</option>
+                                        <option value="Spouse">Spouse</option>
+                                        <option value="Child">Child</option>
+                                        <option value="Parent">Parent</option>
+                                        <option value="Sibling">Sibling</option>
+                                        <option value="Guardian">Guardian</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label>Medical History</label>
+                                    <textarea name="medical_history" class="form-control" rows="2"></textarea>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -155,6 +178,7 @@
                 </form>
             </div>
         </div>
+
 
         <!-- Edit Patient Modal -->
         <div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
@@ -177,13 +201,18 @@
                                         <option value="Female">Female</option>
                                     </select>
                                 </div>
-                                <div class="col-12">
-                                    <label>Weight (kg)</label>
-                                    <input type="number" step="1" id="editWeight" name="weight" class="form-control">
-                                </div>
                                 <div class="col-12"><label>Contact Info</label><input type="text" id="editContact" name="contact_info" class="form-control"></div>
                                 <div class="col-12"><label>Medical History</label><textarea id="editMedicalHistory" name="medical_history" class="form-control" rows="2"></textarea></div>
-                                <div class="col-12"><label>Next of Kin Contact</label><input type="text" id="editNextOfKin" name="next_of_kin_contact" class="form-control"></div>
+                                <div class="col-12"><label>Next of Kin Contact</label><input type="text" id="editNextOfKinContact" name="next_of_kin_contact" class="form-control"></div>
+                                <div class="col-12"><label>Next of Kin Relationship</label>
+                                    <select id="editNextOfKinRelationship" name="next_of_kin_relationship" class="form-select" required>
+                                        <option value="Spouse">Spouse</option>
+                                        <option value="Child">Child</option>
+                                        <option value="Parent">Parent</option>
+                                        <option value="Sibling">ibling</option>
+                                        <option value="Guardian">Guardian</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -229,9 +258,9 @@
                         <p><strong>Date of Birth:</strong> <span id="viewDob"></span></p>
                         <p><strong>Gender:</strong> <span id="viewGender"></span></p>
                         <p><strong>Contact Info:</strong> <span id="viewContact"></span></p>
-                        <p><strong>Weight:</strong> <span id="viewWeight"></span></p>
                         <p><strong>Medical History:</strong> <span id="viewMedicalHistory"></span></p>
-                        <p><strong>Next of Kin:</strong> <span id="viewNextOfKin"></span></p>
+                        <p><strong>Next of Kin Contact:</strong> <span id="viewNextOfKinContact"></span></p>
+                        <p><strong>Next of Kin Relationship:</strong> <span id="viewNextOfKinRelationship"></span></p>
                     </div>
                 </div>
             </div>
@@ -253,11 +282,10 @@
                 document.getElementById('editLastName').value = this.dataset.last_name;
                 document.getElementById('editDob').value = this.dataset.dob;
                 document.getElementById('editGender').value = this.dataset.gender;
-                document.getElementById('editWeight').value = this.dataset.weight;
-
                 document.getElementById('editContact').value = this.dataset.contact_info;
                 document.getElementById('editMedicalHistory').value = this.dataset.medical_history;
-                document.getElementById('editNextOfKin').value = this.dataset.next_of_kin;
+                document.getElementById('editNextOfKinContact').value = this.dataset.next_of_kin_contact;
+                document.getElementById('editNextOfKinRelationship').value = this.dataset.next_of_kin_relationship;
             });
         });
 
@@ -269,9 +297,8 @@
                 document.getElementById('viewGender').innerText = this.dataset.gender;
                 document.getElementById('viewContact').innerText = this.dataset.contact_info;
                 document.getElementById('viewMedicalHistory').innerText = this.dataset.medical_history;
-                document.getElementById('viewNextOfKin').innerText = this.dataset.next_of_kin;
-                document.getElementById('viewWeight').innerText = this.dataset.weight + ' kg';
-
+                document.getElementById('viewNextOfKinContact').innerText = this.dataset.next_of_kin_contact;
+                document.getElementById('viewNextOfKinRelationship').innerText = this.dataset.next_of_kin_relationship;
             });
         });
 
