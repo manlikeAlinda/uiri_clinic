@@ -6,6 +6,9 @@ use App\Controllers\BaseController;
 use App\Models\VisitModel;
 use App\Models\PatientModel;
 use App\Models\DoctorModel;
+use App\Models\DrugModel;
+use App\Models\SupplyModel;
+
 use CodeIgniter\API\ResponseTrait;
 
 class VisitController extends BaseController
@@ -15,20 +18,27 @@ class VisitController extends BaseController
     protected VisitModel   $visitModel;
     protected PatientModel $patientModel;
     protected DoctorModel  $doctorModel;
+    protected DrugModel $drugModel;
+    protected SupplyModel $supplyModel; // ✅ Add this line
+
 
     public function __construct()
     {
         $this->visitModel   = new VisitModel();
         $this->patientModel = new PatientModel();
         $this->doctorModel  = new DoctorModel();
+        $this->drugModel    = new DrugModel();     // ✅ Add this
+        $this->supplyModel  = new SupplyModel();   // ✅ Add this
     }
 
     public function index()
     {
         $data = [
-            'visits'   => $this->visitModel->getVisitsWithRelations(),
-            'patients' => $this->patientModel->findAll(),
-            'doctors'  => $this->doctorModel->findAll(),
+            'visits'    => $this->visitModel->getVisitsWithRelations(),
+            'patients'  => $this->patientModel->findAll(),
+            'doctors'   => $this->doctorModel->findAll(),
+            'drugs'     => $this->drugModel->findAll(),     // ✅ Add this
+            'supplies'  => $this->supplyModel->findAll(),   // ✅ And this
         ];
 
         return view('manage_visits', $data);
@@ -55,7 +65,7 @@ class VisitController extends BaseController
             return redirect()->to('/visits')->with('error', 'Visit not found.');
         }
 
-        if (! $this->validate($this->validationRules(update: true))) {
+        if (! $this->validate($this->validationRules(true))) {
             return redirect()->back()
                 ->withInput()
                 ->with('validation', $this->validator)
@@ -63,8 +73,9 @@ class VisitController extends BaseController
         }
 
         $data = $this->collectVisitData();
-        $data['visit_id'] = $id;
-        $this->visitModel->save($data);
+
+        // Ensure the ID is not overridden unexpectedly
+        $this->visitModel->update($id, $data);
 
         return redirect()->to('/visits')
             ->with('success', 'Visit updated successfully.');

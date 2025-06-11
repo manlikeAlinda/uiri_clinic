@@ -15,6 +15,7 @@
         <?= validation_show_error('outcome', '<div class="text-danger small">', '</div>') ?>
     </div>
 </div>
+
 <div class="row gx-3 gy-3">
     <div class="col-md-6" id="addReferralGroup" style="display:none;">
         <label for="referral_reason" class="form-label">Reason for Referral</label>
@@ -262,42 +263,6 @@
 </script>
 
 
-<!-- View Visit Modal -->
-<div class="modal fade" id="viewVisitModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Visit Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Patient:</strong> <span id="viewPatient"></span></p>
-                <p><strong>Doctor:</strong> <span id="viewDoctor"></span></p>
-                <p><strong>Date:</strong> <span id="viewDate"></span></p>
-                <p><strong>Weight:</strong> <span id="viewWeight"></span> kg</p>
-                <p><strong>Blood Pressure:</strong> <span id="viewBP"></span></p>
-                <p><strong>Pulse:</strong> <span id="viewPulse"></span> bpm</p>
-                <p><strong>Temperature:</strong> <span id="viewTemp"></span> °C</p>
-                <p><strong>SpO₂:</strong> <span id="viewSpO2"></span> %</p>
-                <p><strong>Respiration:</strong> <span id="viewRespiration"></span> bpm</p>
-
-                <p><strong>Patient Complaints:</strong> <span id="viewComplaints"></span></p>
-                <p><strong>Examination Notes:</strong> <span id="viewExamination"></span></p>
-                <p><strong>Investigations:</strong> <span id="viewInvestigations"></span></p>
-                <p><strong>Diagnosis:</strong> <span id="viewDiagnosis"></span></p>
-                <p><strong>Treatment Notes:</strong> <span id="viewTreatment"></span></p>
-                <p><strong>Outcome:</strong> <span id="viewOutcome"></span></p>
-                <p><strong>Reason for Referral:</strong> <span id="viewReferralReason"></span></p>
-                <p><strong>Condition at Discharge:</strong> <span id="viewDischargeCondition"></span></p>
-                <p><strong>Return Date:</strong> <span id="viewReturnDate"></span></p>
-                <p><strong>Follow-Up Notes:</strong> <span id="viewFollowUpNotes"></span></p>
-                <p><strong>Category:</strong> <span id="viewCategory"></span></p>
-                <p><strong>Admission Time:</strong> <span id="viewAdmission"></span></p>
-                <p><strong>Discharge Time:</strong> <span id="viewDischarge"></span></p>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Delete Visit Modal -->
 <div class="modal fade" id="deleteVisitModal" tabindex="-1" aria-hidden="true">
