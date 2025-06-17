@@ -34,12 +34,12 @@
                 </a>
             </li>
 
-            <li>
+            <!-- <li>
                 <a href="<?= base_url('equipment') ?>">
                     <iconify-icon icon="mdi:medical-bag" class="menu-icon"></iconify-icon>
                     <span>Manage Equipment</span>
                 </a>
-            </li>
+            </li> -->
 
             <li>
                 <a href="<?= base_url('supplies') ?>">

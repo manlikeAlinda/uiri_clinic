@@ -56,77 +56,94 @@
                                 <td><?= date('Y-m-d', strtotime($visit['visit_date'])) ?></td>
                                 <td><?= esc($visit['weight']) ?></td>
                                 <td>
-                                    <small>BP: <?= esc($visit['blood_pressure']) ?: '-' ?></small><br>
-                                    <small>Pulse: <?= esc($visit['pulse']) ?: '-' ?> bpm</small><br>
-                                    <small>Temp: <?= esc($visit['temperature']) ?: '-' ?> °C</small><br>
-                                    <small>SpO₂: <?= esc($visit['sp02']) ?: '-' ?> %</small><br>
-                                    <small>Resp: <?= esc($visit['respiration_rate']) ?: '-' ?> bpm</small>
+                                    <button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="
+                                            BP: <?= esc($visit['blood_pressure']) ?: '-' ?> |
+                                            Pulse: <?= esc($visit['pulse']) ?: '-' ?> bpm |
+                                            Temp: <?= esc($visit['temperature']) ?: '-' ?> °C |
+                                            SpO₂: <?= esc($visit['sp02']) ?: '-' ?>% |
+                                            Resp: <?= esc($visit['respiration_rate']) ?: '-' ?> bpm
+                                            ">
+                                        <iconify-icon icon="mdi:heart-pulse" class="text-danger"></iconify-icon>
+                                    </button>
                                 </td>
-                                <td class="d-flex gap-2">
-                                    <!-- View -->
-                                    <button class="btn btn-info btn-sm view-btn"
-                                        data-bs-toggle="modal" data-bs-target="#viewVisitModal"
-                                        data-id="<?= $visit['visit_id'] ?>"
-                                        data-patient="<?= esc($visit['patient_name']) ?>"
-                                        data-doctor="<?= esc($visit['doctor_name']) ?>"
-                                        data-date="<?= esc($visit['visit_date']) ?>"
-                                        data-weight="<?= esc($visit['weight']) ?>"
-                                        data-bp="<?= esc($visit['blood_pressure']) ?>"
-                                        data-pulse="<?= esc($visit['pulse']) ?>"
-                                        data-temp="<?= esc($visit['temperature']) ?>"
-                                        data-spo2="<?= esc($visit['sp02']) ?>"
-                                        data-respiration="<?= esc($visit['respiration_rate']) ?>"
-                                        data-category="<?= esc($visit['visit_category']) ?>"
-                                        data-admission="<?= esc($visit['admission_time']) ?>"
-                                        data-patient_complaints="<?= esc($visit['patient_complaints']) ?>"
-                                        data-examination_notes="<?= esc($visit['examination_notes']) ?>"
-                                        data-investigations="<?= esc($visit['investigations']) ?>"
-                                        data-diagnosis="<?= esc($visit['diagnosis']) ?>">
-                                        <iconify-icon icon="mdi:eye-outline" width="20" height="20" class="text-white"></iconify-icon>
-                                    </button>
 
-                                    <!-- Edit -->
-                                    <button class="btn btn-success btn-sm edit-visit-btn"
-                                        data-bs-toggle="modal" data-bs-target="#editVisitModal"
-                                        data-id="<?= $visit['visit_id'] ?>"
-                                        data-patient_id="<?= $visit['patient_id'] ?>"
-                                        data-doctor_id="<?= $visit['doctor_id'] ?>"
-                                        data-date="<?= esc($visit['visit_date']) ?>"
-                                        data-weight="<?= esc($visit['weight']) ?>"
-                                        data-bp="<?= esc($visit['blood_pressure']) ?>"
-                                        data-pulse="<?= esc($visit['pulse']) ?>"
-                                        data-temp="<?= esc($visit['temperature']) ?>"
-                                        data-spo2="<?= esc($visit['sp02']) ?>"
-                                        data-respiration="<?= esc($visit['respiration_rate']) ?>"
-                                        data-category="<?= esc($visit['visit_category']) ?>"
-                                        data-admission="<?= esc($visit['admission_time']) ?>"
-                                        data-patient_complaints="<?= esc($visit['patient_complaints']) ?>"
-                                        data-examination_notes="<?= esc($visit['examination_notes']) ?>"
-                                        data-investigations="<?= esc($visit['investigations']) ?>"
-                                        data-diagnosis="<?= esc($visit['diagnosis']) ?>">
-                                        <iconify-icon icon="mdi:pencil-outline" width="20" height="20" class="text-white"></iconify-icon>
-                                    </button>
 
-                                    <!-- Delete -->
-                                    <button
-                                        class="btn btn-danger btn-sm delete-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteVisitModal"
-                                        data-id="<?= esc($visit['visit_id']) ?>"
-                                        data-patient="<?= esc($visit['patient_name']) ?>">
-                                        <iconify-icon icon="mingcute:delete-2-line" width="20" height="20" class="text-white"></iconify-icon>
-                                    </button>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-primary view-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#visitUnifiedModal"
+                                            data-id="<?= $visit['visit_id'] ?>"
+                                            data-fetch-url="<?= base_url('visits/details/' . $visit['visit_id']) ?>"
+                                            data-patient="<?= esc($visit['patient_name']) ?>"
+                                            data-doctor="<?= esc($visit['doctor_name']) ?>"
+                                            data-date="<?= esc($visit['visit_date']) ?>"
+                                            data-weight="<?= esc($visit['weight']) ?>"
+                                            data-bp="<?= esc($visit['blood_pressure']) ?>"
+                                            data-pulse="<?= esc($visit['pulse']) ?>"
+                                            data-temp="<?= esc($visit['temperature']) ?>"
+                                            data-spo2="<?= esc($visit['sp02']) ?>"
+                                            data-respiration="<?= esc($visit['respiration_rate']) ?>"
+                                            data-category="<?= esc($visit['visit_category']) ?>"
+                                            data-admission="<?= esc($visit['admission_time']) ?>"
+                                            data-patient_complaints="<?= esc($visit['patient_complaints']) ?>"
+                                            data-examination_notes="<?= esc($visit['examination_notes']) ?>"
+                                            data-investigations="<?= esc($visit['investigations']) ?>"
+                                            data-diagnosis="<?= esc($visit['diagnosis']) ?>">
+                                            View
+                                        </button>
 
-                                    <!-- Outcomes & Treatments Button -->
-                                    <button type="button"
-                                        class="btn btn-warning btn-sm edit-details-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#visitDetailsModal"
-                                        data-visit-id="<?= $visit['visit_id'] ?>">
-                                        <i class="bi bi-journal-medical"></i> Outcomes & Treatments
-                                    </button>
+                                        <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                            <span class="visually-hidden">Toggle Dropdown</span>
+                                        </button>
 
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="btn btn-info dropdown-item edit-visit-btn"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editVisitModal"
+                                                    data-id="<?= $visit['visit_id'] ?>"
+                                                    data-patient_id="<?= $visit['patient_id'] ?>"
+                                                    data-doctor_id="<?= $visit['doctor_id'] ?>"
+                                                    data-date="<?= esc($visit['visit_date']) ?>"
+                                                    data-weight="<?= esc($visit['weight']) ?>"
+                                                    data-bp="<?= esc($visit['blood_pressure']) ?>"
+                                                    data-pulse="<?= esc($visit['pulse']) ?>"
+                                                    data-temp="<?= esc($visit['temperature']) ?>"
+                                                    data-spo2="<?= esc($visit['sp02']) ?>"
+                                                    data-respiration="<?= esc($visit['respiration_rate']) ?>"
+                                                    data-category="<?= esc($visit['visit_category']) ?>"
+                                                    data-admission="<?= esc($visit['admission_time']) ?>"
+                                                    data-patient_complaints="<?= esc($visit['patient_complaints']) ?>"
+                                                    data-examination_notes="<?= esc($visit['examination_notes']) ?>"
+                                                    data-investigations="<?= esc($visit['investigations']) ?>"
+                                                    data-diagnosis="<?= esc($visit['diagnosis']) ?>">
+                                                    Edit Visit
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button type="button"
+                                                    class="btn btn-warning btn-sm edit-details-btn"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#visitDetailsModal"
+                                                    data-visit-id="<?= $visit['visit_id'] ?>">
+                                                    Treatment & Outcomes
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="btn btn-danger dropdown-item delete-btn"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteVisitModal"
+                                                    data-id="<?= esc($visit['visit_id']) ?>"
+                                                    data-patient="<?= esc($visit['patient_name']) ?>">
+                                                    Delete Visit
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
+
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -145,110 +162,131 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="container-fluid">
-                                <!-- Group 1: Basic Info -->
-                                <div class="row gx-3 gy-3">
-                                    <div class="col-md-6">
-                                        <label for="addPatientId" class="form-label">Patient</label>
-                                        <select id="addPatientId" name="patient_id" class="form-select" required>
-                                            <option value="">Select Patient</option>
-                                            <?php foreach ($patients as $p): ?>
-                                                <option value="<?= $p['patient_id'] ?>"><?= esc($p['first_name'] . ' ' . $p['last_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <?= validation_show_error('patient_id', '<div class="text-danger small">', '</div>') ?>
+                            <div class="stepper">
+                                <ul class="nav nav-pills mb-3" id="visitSteps" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button type="button" class="nav-link active" id="step1-tab" data-bs-toggle="pill" data-bs-target="#step1">
+                                            Basic Info
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button type="button" class="nav-link" id="step2-tab" data-bs-toggle="pill" data-bs-target="#step2">
+                                            Vitals
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button type="button" class="nav-link" id="step3-tab" data-bs-toggle="pill" data-bs-target="#step3">
+                                            Assessment
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content p-2" id="visitStepsContent">
+                                    <!-- Step 1: Basic Info -->
+                                    <div class="tab-pane fade show active" id="step1" role="tabpanel">
+                                        <div class="row gx-3 gy-3">
+                                            <div class="col-md-6">
+                                                <label for="addPatientId" class="form-label">Patient</label>
+                                                <select id="addPatientId" name="patient_id" class="form-select" required>
+                                                    <option value="">Select Patient</option>
+                                                    <?php foreach ($patients as $p): ?>
+                                                        <option value="<?= $p['patient_id'] ?>"><?= esc($p['first_name'] . ' ' . $p['last_name']) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <?= validation_show_error('patient_id', '<div class="text-danger small">', '</div>') ?>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="addDoctorId" class="form-label">Doctor</label>
+                                                <select id="addDoctorId" name="doctor_id" class="form-select" required>
+                                                    <option value="">Select Doctor</option>
+                                                    <?php foreach ($doctors as $d): ?>
+                                                        <option value="<?= $d['doctor_id'] ?>"><?= esc($d['first_name'] . ' ' . $d['last_name']) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <?= validation_show_error('doctor_id', '<div class="text-danger small">', '</div>') ?>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="addVisitDate" class="form-label">Visit Date</label>
+                                                <input id="addVisitDate" type="date" name="visit_date" class="form-control" required>
+                                                <?= validation_show_error('visit_date', '<div class="text-danger small">', '</div>') ?>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="addVisitCategory" class="form-label">Category</label>
+                                                <select id="addVisitCategory" name="visit_category" class="form-select" required>
+                                                    <option value="">Select</option>
+                                                    <option value="in-patient">In-Patient</option>
+                                                    <option value="out-patient">Out-Patient</option>
+                                                </select>
+                                                <?= validation_show_error('visit_category', '<div class="text-danger small">', '</div>') ?>
+                                            </div>
+                                            <div class="col-md-6" id="addAdmissionContainer" style="display:none;">
+                                                <label for="addAdmissionTime" class="form-label">Admission Time</label>
+                                                <input id="addAdmissionTime" type="datetime-local" name="admission_time" class="form-control">
+                                                <?= validation_show_error('admission_time', '<div class="text-danger small">', '</div>') ?>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="addDoctorId" class="form-label">Doctor</label>
-                                        <select id="addDoctorId" name="doctor_id" class="form-select" required>
-                                            <option value="">Select Doctor</option>
-                                            <?php foreach ($doctors as $d): ?>
-                                                <option value="<?= $d['doctor_id'] ?>"><?= esc($d['first_name'] . ' ' . $d['last_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <?= validation_show_error('doctor_id', '<div class="text-danger small">', '</div>') ?>
+
+                                    <!-- Step 2: Vitals -->
+                                    <div class="tab-pane fade" id="step2" role="tabpanel">
+                                        <div class="row gx-3 gy-3">
+                                            <div class="col-md-6">
+                                                <label for="weight" class="form-label">Weight (kg)</label>
+                                                <input id="weight" name="weight" type="number" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="blood_pressure" class="form-label">Blood Pressure</label>
+                                                <input id="blood_pressure" name="blood_pressure" type="text" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="pulse" class="form-label">Pulse</label>
+                                                <input id="pulse" name="pulse" type="number" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="temperature" class="form-label">Temperature</label>
+                                                <input id="temperature" name="temperature" type="number" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="sp02" class="form-label">SpO₂ (%)</label>
+                                                <input id="sp02" name="sp02" type="number" class="form-control">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="respiration_rate" class="form-label">Respiration Rate</label>
+                                                <input id="respiration_rate" name="respiration_rate" type="number" class="form-control">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="addVisitDate" class="form-label">Visit Date</label>
-                                        <input id="addVisitDate" type="date" name="visit_date" class="form-control" required>
-                                        <?= validation_show_error('visit_date', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="addVisitCategory" class="form-label">Category</label>
-                                        <select id="addVisitCategory" name="visit_category" class="form-select" required>
-                                            <option value="">Select</option>
-                                            <option value="in-patient">In-Patient</option>
-                                            <option value="out-patient">Out-Patient</option>
-                                        </select>
-                                        <?= validation_show_error('visit_category', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6" id="addAdmissionContainer" style="display:none;">
-                                        <label for="addAdmissionTime" class="form-label">Admission Time</label>
-                                        <input id="addAdmissionTime" type="datetime-local" name="admission_time" class="form-control">
-                                        <?= validation_show_error('admission_time', '<div class="text-danger small">', '</div>') ?>
+
+                                    <!-- Step 3: Assessment -->
+                                    <div class="tab-pane fade" id="step3" role="tabpanel">
+                                        <div class="row gx-3 gy-3">
+                                            <div class="col-md-6">
+                                                <label for="patient_complaints" class="form-label">Patient Complaints</label>
+                                                <textarea id="patient_complaints" name="patient_complaints" rows="2" class="form-control"></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="examination_notes" class="form-label">Examination Notes</label>
+                                                <textarea id="examination_notes" name="examination_notes" rows="2" class="form-control"></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="investigations" class="form-label">Investigations</label>
+                                                <textarea id="investigations" name="investigations" rows="2" class="form-control"></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="diagnosis" class="form-label">Diagnosis</label>
+                                                <textarea id="diagnosis" name="diagnosis" rows="2" class="form-control"></textarea>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Group 2: Vitals -->
-                                <div class="row gx-3 gy-3">
-                                    <div class="col-md-6">
-                                        <label for="blood_pressure" class="form-label">Blood Pressure</label>
-                                        <input id="blood_pressure" type="text" name="blood_pressure" class="form-control" placeholder="120/80 mmHg">
-                                        <?= validation_show_error('blood_pressure', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="weight" class="form-label">Weight (kg)</label>
-                                        <input id="weight" type="number" step="0.1" name="weight" class="form-control">
-                                        <?= validation_show_error('weight', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="pulse" class="form-label">Pulse (bpm)</label>
-                                        <input id="pulse" type="number" name="pulse" class="form-control">
-                                        <?= validation_show_error('pulse', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="temperature" class="form-label">Temperature (°C)</label>
-                                        <input id="temperature" type="number" step="0.1" name="temperature" class="form-control">
-                                        <?= validation_show_error('temperature', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="sp02" class="form-label">SpO₂ (%)</label>
-                                        <input id="sp02" type="number" step="0.1" name="sp02" class="form-control">
-                                        <?= validation_show_error('sp02', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="respiration_rate" class="form-label">Respiration Rate (bpm)</label>
-                                        <input id="respiration_rate" type="number" name="respiration_rate" class="form-control">
-                                        <?= validation_show_error('respiration_rate', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="bootstrap.Tab.getInstance(document.querySelector('#step1-tab')).show()">Back</button>
+                                    <button type="button" class="btn btn-outline-primary" onclick="bootstrap.Tab.getInstance(document.querySelector('#step2-tab')).show()">Next</button>
                                 </div>
-
-                                <!-- Group 3: Assessment & Diagnosis -->
-                                <div class="row gx-3 gy-3">
-                                    <div class="col-md-6">
-                                        <label for="patient_complaints" class="form-label">Patient Complaints</label>
-                                        <textarea id="patient_complaints" name="patient_complaints" class="form-control" rows="2" required></textarea>
-                                        <?= validation_show_error('patient_complaints', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="examination_notes" class="form-label">Examination Notes</label>
-                                        <textarea id="examination_notes" name="examination_notes" class="form-control" rows="2"></textarea>
-                                        <?= validation_show_error('examination_notes', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="investigations" class="form-label">Investigations (Lab Results)</label>
-                                        <textarea id="investigations" name="investigations" class="form-control" rows="2"></textarea>
-                                        <?= validation_show_error('investigations', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="diagnosis" class="form-label">Diagnosis</label>
-                                        <textarea id="diagnosis" name="diagnosis" class="form-control" rows="2" required></textarea>
-                                        <?= validation_show_error('diagnosis', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
+
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">Save Visit</button>
                         </div>
@@ -263,124 +301,131 @@
                 <form id="editVisitForm" method="post">
                     <?= csrf_field() ?>
                     <input type="hidden" name="visit_id" id="editVisitId">
+
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="editVisitModalLabel">Edit Visit</h5>
+                            <h5 class="modal-title">Edit Visit</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
+
                         <div class="modal-body">
-                            <div class="container-fluid">
+                            <!-- Step Tabs -->
+                            <ul class="nav nav-pills mb-3" role="tablist">
+                                <li class="nav-item">
+                                    <button type="button" class="nav-link active" data-bs-toggle="pill" data-bs-target="#editStep1">
+                                        1. Info
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button type="button" class="nav-link" data-bs-toggle="pill" data-bs-target="#editStep2">
+                                        2. Vitals
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button type="button" class="nav-link" data-bs-toggle="pill" data-bs-target="#editStep3">
+                                        3. Assessment
+                                    </button>
+                                </li>
+                            </ul>
 
-                                <!-- Group 1: Basic Info -->
-                                <h6 class="mt-2 mb-2 text-secondary">Patient Info</h6>
-                                <div class="row gx-3 gy-3">
-                                    <div class="col-md-6">
-                                        <label for="editPatientId" class="form-label">Patient</label>
-                                        <select id="editPatientId" name="patient_id" class="form-select" required>
-                                            <?php foreach ($patients as $p): ?>
-                                                <option value="<?= $p['patient_id'] ?>"><?= esc($p['first_name'] . ' ' . $p['last_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <?= validation_show_error('patient_id', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editDoctorId" class="form-label">Doctor</label>
-                                        <select id="editDoctorId" name="doctor_id" class="form-select" required>
-                                            <?php foreach ($doctors as $d): ?>
-                                                <option value="<?= $d['doctor_id'] ?>"><?= esc($d['first_name'] . ' ' . $d['last_name']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <?= validation_show_error('doctor_id', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editVisitDate" class="form-label">Visit Date</label>
-                                        <input id="editVisitDate" type="date" name="visit_date"
-                                            class="form-control"
-                                            value="<?= isset($visit['visit_date']) ? date('Y-m-d', strtotime($visit['visit_date'])) : '' ?>"
-                                            required>
-                                        <?= validation_show_error('visit_date', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editVisitCategory" class="form-label">Category</label>
-                                        <select id="editVisitCategory" name="visit_category" class="form-select" required>
-                                            <option value="">Select</option>
-                                            <option value="in-patient">In-Patient</option>
-                                            <option value="out-patient">Out-Patient</option>
-                                        </select>
-                                        <?= validation_show_error('visit_category', '<div class="text-danger small">', '</div>') ?>
+                            <div class="tab-content p-3 bg-light border rounded">
+                                <!-- Step 1: Info -->
+                                <div class="tab-pane fade show active" id="editStep1">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="editPatientId" class="form-label">Patient</label>
+                                            <select id="editPatientId" name="patient_id" class="form-select" required>
+                                                <option value="">Select Patient</option>
+                                                <?php foreach ($patients as $patient): ?>
+                                                    <option value="<?= esc($patient['patient_id']) ?>">
+                                                        <?= esc($patient['first_name'] . ' ' . $patient['last_name']) ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editDoctorId" class="form-label">Doctor</label>
+                                            <select id="editDoctorId" name="doctor_id" class="form-select" required>
+                                                <option value="">Select Doctor</option>
+                                                <?php foreach ($doctors as $doctor): ?>
+                                                    <option value="<?= esc($doctor['doctor_id']) ?>">
+                                                        <?= esc($doctor['first_name'] . ' ' . $doctor['last_name']) ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editVisitDate" class="form-label">Visit Date</label>
+                                            <input type="date" id="editVisitDate" name="visit_date" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editVisitCategory" class="form-label">Category</label>
+                                            <select id="editVisitCategory" name="visit_category" class="form-select" required>
+                                                <option value="in-patient">In-Patient</option>
+                                                <option value="out-patient">Out-Patient</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6" id="editAdmissionFields" style="display: none;">
+                                            <label for="editAdmissionTime" class="form-label">Admission Time</label>
+                                            <input type="datetime-local" id="editAdmissionTime" name="admission_time" class="form-control">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Conditional Admission/Discharge -->
-                                <div class="row gx-3 gy-3" id="editAdmissionFields" style="display:none;">
-                                    <div class="col-md-6">
-                                        <label for="editAdmissionTime" class="form-label">Admission Time</label>
-                                        <input id="editAdmissionTime" type="datetime-local" name="admission_time" class="form-control">
-                                        <?= validation_show_error('admission_time', '<div class="text-danger small">', '</div>') ?>
+                                <!-- Step 2: Vitals -->
+                                <div class="tab-pane fade" id="editStep2">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="editWeight" class="form-label">Weight (kg)</label>
+                                            <input type="number" step="0.1" id="editWeight" name="weight" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editBP" class="form-label">Blood Pressure</label>
+                                            <input type="text" id="editBP" name="blood_pressure" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editPulse" class="form-label">Pulse</label>
+                                            <input type="number" id="editPulse" name="pulse" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editTemp" class="form-label">Temperature (°C)</label>
+                                            <input type="number" step="0.1" id="editTemp" name="temperature" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editSpO2" class="form-label">SpO₂ (%)</label>
+                                            <input type="number" step="0.1" id="editSpO2" name="sp02" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editRespiration" class="form-label">Respiration Rate</label>
+                                            <input type="number" id="editRespiration" name="respiration_rate" class="form-control">
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- Group 2: Vitals -->
-                                <h6 class="mt-3 mb-2 text-secondary">Vitals</h6>
-                                <div class="row gx-3 gy-3">
-                                    <div class="col-md-6">
-                                        <label for="editWeight" class="form-label">Weight (kg)</label>
-                                        <input id="editWeight" type="number" step="0.1" name="weight" class="form-control">
-                                        <?= validation_show_error('weight', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editBP" class="form-label">Blood Pressure</label>
-                                        <input id="editBP" type="text" name="blood_pressure" class="form-control">
-                                        <?= validation_show_error('blood_pressure', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editPulse" class="form-label">Pulse (bpm)</label>
-                                        <input id="editPulse" type="number" name="pulse" class="form-control">
-                                        <?= validation_show_error('pulse', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editTemp" class="form-label">Temperature (°C)</label>
-                                        <input id="editTemp" type="number" step="0.1" name="temperature" class="form-control">
-                                        <?= validation_show_error('temperature', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editSpO2" class="form-label">SpO₂ (%)</label>
-                                        <input id="editSpO2" type="number" step="0.1" name="sp02" class="form-control">
-                                        <?= validation_show_error('sp02', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editRespiration" class="form-label">Respiration Rate (bpm)</label>
-                                        <input id="editRespiration" type="number" name="respiration_rate" class="form-control">
-                                        <?= validation_show_error('respiration_rate', '<div class="text-danger small">', '</div>') ?>
+                                <!-- Step 3: Assessment -->
+                                <div class="tab-pane fade" id="editStep3">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="editComplaints" class="form-label">Patient Complaints</label>
+                                            <textarea id="editComplaints" name="patient_complaints" rows="2" class="form-control" required></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editExamination" class="form-label">Examination Notes</label>
+                                            <textarea id="editExamination" name="examination_notes" rows="2" class="form-control"></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editInvestigations" class="form-label">Investigations</label>
+                                            <textarea id="editInvestigations" name="investigations" rows="2" class="form-control"></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="editDiagnosis" class="form-label">Diagnosis</label>
+                                            <textarea id="editDiagnosis" name="diagnosis" rows="2" class="form-control" required></textarea>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <!-- Group 3: Assessment & Diagnosis -->
-                                <h6 class="mt-3 mb-2 text-secondary">Assessment &amp; Diagnosis</h6>
-                                <div class="row gx-3 gy-3">
-                                    <div class="col-md-6">
-                                        <label for="editComplaints" class="form-label">Patient Complaints</label>
-                                        <textarea id="editComplaints" name="patient_complaints" class="form-control" rows="2" required></textarea>
-                                        <?= validation_show_error('patient_complaints', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editExamination" class="form-label">Examination Notes</label>
-                                        <textarea id="editExamination" name="examination_notes" class="form-control" rows="2"></textarea>
-                                        <?= validation_show_error('examination_notes', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editInvestigations" class="form-label">Investigations</label>
-                                        <textarea id="editInvestigations" name="investigations" class="form-control" rows="2"></textarea>
-                                        <?= validation_show_error('investigations', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="editDiagnosis" class="form-label">Diagnosis</label>
-                                        <textarea id="editDiagnosis" name="diagnosis" class="form-control" rows="2" required></textarea>
-                                        <?= validation_show_error('diagnosis', '<div class="text-danger small">', '</div>') ?>
-                                    </div>
-                                </div>
-                            </div>
+                            </div> <!-- end tab-content -->
                         </div>
+
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-success">Update Visit</button>
                         </div>
@@ -389,30 +434,63 @@
             </div>
         </div>
 
-        <!-- View Visit Modal -->
-        <div class="modal fade" id="viewVisitModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
+        <!-- //unified visit View -->
+        <div class="modal fade" id="visitUnifiedModal" tabindex="-1" aria-labelledby="visitUnifiedModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Visit Details</h5>
+                        <h5 class="modal-title">Visit Summary & Actions</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body">
-                        <p><strong>Patient:</strong> <span id="viewPatient"></span></p>
-                        <p><strong>Doctor:</strong> <span id="viewDoctor"></span></p>
-                        <p><strong>Date:</strong> <span id="viewDate"></span></p>
-                        <p><strong>Weight:</strong> <span id="viewWeight"></span> kg</p>
-                        <p><strong>Blood Pressure:</strong> <span id="viewBP"></span></p>
-                        <p><strong>Pulse:</strong> <span id="viewPulse"></span> bpm</p>
-                        <p><strong>Temperature:</strong> <span id="viewTemp"></span> °C</p>
-                        <p><strong>SpO₂:</strong> <span id="viewSpO2"></span> %</p>
-                        <p><strong>Respiration:</strong> <span id="viewRespiration"></span> bpm</p>
-                        <p><strong>Patient Complaints:</strong> <span id="viewComplaints"></span></p>
-                        <p><strong>Examination Notes:</strong> <span id="viewExamination"></span></p>
-                        <p><strong>Investigations:</strong> <span id="viewInvestigations"></span></p>
-                        <p><strong>Diagnosis:</strong> <span id="viewDiagnosis"></span></p>
-                        <p><strong>Category:</strong> <span id="viewCategory"></span></p>
-                        <p><strong>Admission Time:</strong> <span id="viewAdmission"></span></p>
+                        <ul class="nav nav-tabs mb-3" role="tablist">
+                            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overviewTab">Overview</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#prescriptionsTab">Prescriptions</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#suppliesTab">Supplies</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#outcomesTab">Outcome</button></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Overview -->
+                            <div class="tab-pane fade show active" id="overviewTab" role="tabpanel">
+                                <div class="row g-3">
+                                    <div class="col-md-6"><strong>Patient:</strong> <span id="uPatient"></span></div>
+                                    <div class="col-md-6"><strong>Doctor:</strong> <span id="uDoctor"></span></div>
+                                    <div class="col-md-6"><strong>Date:</strong> <span id="uDate"></span></div>
+                                    <div class="col-md-6"><strong>Category:</strong> <span id="uCategory"></span></div>
+                                    <div class="col-md-6"><strong>Weight:</strong> <span id="uWeight"></span> kg</div>
+                                    <div class="col-md-6"><strong>Blood Pressure:</strong> <span id="uBP"></span></div>
+                                    <div class="col-md-6"><strong>Pulse:</strong> <span id="uPulse"></span> bpm</div>
+                                    <div class="col-md-6"><strong>Temperature:</strong> <span id="uTemp"></span> °C</div>
+                                    <div class="col-md-6"><strong>SpO₂:</strong> <span id="uSpO2"></span> %</div>
+                                    <div class="col-md-6"><strong>Respiration:</strong> <span id="uRespiration"></span> bpm</div>
+                                    <div class="col-md-12"><strong>Complaints:</strong> <span id="uComplaints"></span></div>
+                                    <div class="col-md-12"><strong>Examination Notes:</strong> <span id="uExamination"></span></div>
+                                    <div class="col-md-12"><strong>Investigations:</strong> <span id="uInvestigations"></span></div>
+                                    <div class="col-md-12"><strong>Diagnosis:</strong> <span id="uDiagnosis"></span></div>
+                                    <div class="col-md-12"><strong>Admission:</strong> <span id="uAdmission"></span></div>
+                                </div>
+                            </div>
+
+                            <!-- Prescriptions Tab -->
+                            <div class="tab-pane fade" id="prescriptionsTab" role="tabpanel">
+                                <ul id="uPrescriptions" class="list-group"></ul>
+                            </div>
+
+                            <!-- Supplies Tab -->
+                            <div class="tab-pane fade" id="suppliesTab" role="tabpanel">
+                                <ul id="uSupplies" class="list-group"></ul>
+                            </div>
+
+                            <!-- Outcome Tab -->
+                            <div class="tab-pane fade" id="outcomesTab" role="tabpanel">
+                                <p><strong>Outcome:</strong> <span id="uOutcome"></span></p>
+                                <p><strong>Treatment Notes:</strong> <span id="uTreatmentNotes"></span></p>
+                                <p><strong>Discharge Time:</strong> <span id="uDischargeTime"></span></p>
+                                <p><strong>Referral Reason:</strong> <span id="uReferralReason"></span></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -443,320 +521,69 @@
             </div>
         </div>
 
-        <!-- Visit Details Modal (Prescriptions & Supplies) -->
+        <!-- Visit Details Modal -->
         <div class="modal fade" id="visitDetailsModal" tabindex="-1" aria-labelledby="visitDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="visitDetailsModalLabel">Record Visit Details</h5>
+                        <h5 class="modal-title">Visit Details</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
+                        <!-- Nav Tabs -->
                         <ul class="nav nav-tabs mb-3" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="prescriptions-tab" data-bs-toggle="tab" data-bs-target="#prescriptions" type="button" role="tab">
-                                    Prescriptions
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="supplies-tab" data-bs-toggle="tab" data-bs-target="#supplies" type="button" role="tab">
-                                    Supplies Used
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="outcomes-tab" data-bs-toggle="tab" data-bs-target="#outcomes" type="button" role="tab">
-                                    Outcomes
-                                </button>
-                            </li>
+                            <li class="nav-item"><button type="button" class="nav-link active" id="prescriptions-tab" data-bs-toggle="tab" data-bs-target="#prescriptions">Prescriptions</button></li>
+                            <li class="nav-item"><button type="button" class="nav-link" id="supplies-tab" data-bs-toggle="tab" data-bs-target="#supplies">Supplies</button></li>
+                            <li class="nav-item"><button type="button" class="nav-link" id="outcomes-tab" data-bs-toggle="tab" data-bs-target="#outcomes">Outcomes</button></li>
                         </ul>
 
-
+                        <!-- Tab Content -->
                         <div class="tab-content">
-                            <!-- Prescriptions Tab -->
+
+                            <!-- ✅ PRESCRIPTIONS TAB -->
                             <div class="tab-pane fade show active" id="prescriptions" role="tabpanel">
-                                <form method="post" action="<?= base_url('visits/addDetails') ?>">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="visit_id" id="prescriptionVisitId" class="set-visit-id">
-                                    <input type="hidden" name="type" value="prescription">
-
-                                    <div class="row gx-3 gy-3">
-                                        <div class="col-md-6">
-                                            <label for="drug_id" class="form-label">Drug</label>
-                                            <select id="drug_id" name="drug_id" class="form-select" required>
-                                                <?php foreach ($drugs as $drug): ?>
-                                                    <option value="<?= $drug['drug_id'] ?>"><?= esc($drug['name']) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <?= validation_show_error('drug_id', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="dosage" class="form-label">Dosage</label>
-                                            <input id="dosage" name="dosage" type="text" class="form-control" required>
-                                            <?= validation_show_error('dosage', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="duration" class="form-label">Duration</label>
-                                            <input id="duration" name="duration" type="text" class="form-control">
-                                            <?= validation_show_error('duration', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="quantity" class="form-label">Quantity</label>
-                                            <input id="quantity" name="quantity" type="number" min="1" class="form-control" required>
-                                            <?= validation_show_error('quantity', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="addRoute" class="form-label">Route of Administration</label>
-                                            <select id="addRoute" name="route" class="form-select" required>
-                                                <option value="">Select Route</option>
-                                                <option value="Oral">Oral</option>
-                                                <option value="IV">IV</option>
-                                                <option value="IM">IM</option>
-                                                <option value="Vaginal">Vaginal</option>
-                                                <option value="Topical">Topical</option>
-                                                <option value="Others">Others</option>
-                                            </select>
-                                            <?= validation_show_error('route', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6" id="addOtherRouteGroup" style="display:none;">
-                                            <label for="addOtherRoute" class="form-label">Specify Route</label>
-                                            <input id="addOtherRoute" name="other_route" type="text" class="form-control">
-                                            <?= validation_show_error('other_route', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label for="instructions" class="form-label">Instructions</label>
-                                            <textarea id="instructions" name="instructions" class="form-control" rows="2"></textarea>
-                                            <?= validation_show_error('instructions', '<div class="text-danger small">', '</div>') ?>
+                                <?php foreach ($prescriptions as $p): ?>
+                                    <div class="card mb-2" id="prescription-card-<?= $p['prescription_id'] ?>">
+                                        <div class="card-body">
+                                            <strong><?= esc($p['drug_name']) ?></strong><br>
+                                            Dosage: <?= esc($p['dosage']) ?> | Qty: <?= esc($p['quantity']) ?><br>
+                                            Duration: <?= esc($p['duration']) ?> days | Route: <?= esc($p['route']) ?><br>
+                                            <?= $p['instructions'] ? "Instructions: " . esc($p['instructions']) : '' ?>
                                         </div>
                                     </div>
+                                <?php endforeach; ?>
 
-                                    <button type="submit" class="btn btn-primary mt-3">Add Prescription</button>
-                                </form>
+                                <!-- Add Form -->
+                                <?= view('partials/forms/add_prescription_form') ?>
                             </div>
 
-                            <!-- Supplies Tab -->
+                            <!-- ✅ SUPPLIES TAB -->
                             <div class="tab-pane fade" id="supplies" role="tabpanel">
-                                <form method="post" action="<?= base_url('visits/addDetails') ?>">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="visit_id" id="supplyVisitId" class="set-visit-id">
-                                    <input type="hidden" name="type" value="supply">
-
-                                    <div class="row gx-3 gy-3">
-                                        <div class="col-md-6">
-                                            <label for="supply_id" class="form-label">Supply</label>
-                                            <select id="supply_id" name="supply_id" class="form-select" required>
-                                                <?php foreach ($supplies as $s): ?>
-                                                    <option value="<?= $s['supply_id'] ?>"><?= esc($s['name']) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <?= validation_show_error('supply_id', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="supply_quantity" class="form-label">Quantity Used</label>
-                                            <input id="supply_quantity" name="quantity_used" type="number" class="form-control" min="1" required>
-                                            <?= validation_show_error('quantity_used', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="usage_type" class="form-label">Usage Type</label>
-                                            <select id="usage_type" name="usage_type" class="form-select" required>
-                                                <option value="standard">Standard</option>
-                                                <option value="estimated">Estimated</option>
-                                                <option value="bulk">Bulk</option>
-                                            </select>
-                                            <?= validation_show_error('usage_type', '<div class="text-danger small">', '</div>') ?>
+                                <?php foreach ($supplies_used as $s): ?>
+                                    <div class="card mb-2" id="supply-card-<?= $s['supply_usage_id'] ?>">
+                                        <div class="card-body">
+                                            <strong><?= esc($s['supply_name']) ?></strong><br>
+                                            Quantity: <?= esc($s['quantity_used']) ?> | Type: <?= esc($s['usage_type']) ?>
                                         </div>
                                     </div>
+                                <?php endforeach; ?>
 
-                                    <button type="submit" class="btn btn-primary mt-3">Record Supply</button>
-                                </form>
+                                <!-- Add Form -->
+                                <?= view('partials/forms/add_supply_form') ?>
                             </div>
 
-                            <!-- Outcomes Tab -->
+                            <!-- ✅ OUTCOMES TAB -->
                             <div class="tab-pane fade" id="outcomes" role="tabpanel">
-                                <form method="post" action="<?= base_url('visits/addDetails') ?>">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="visit_id" id="outcomeVisitId" class="set-visit-id">
-                                    <input type="hidden" name="type" value="outcome">
-
-                                    <!-- Group 4: Treatment & Outcome -->
-                                    <div class="row gx-3 gy-3">
-                                        <div class="col-md-6">
-                                            <label for="treatment_notes" class="form-label">Treatment Notes</label>
-                                            <textarea id="treatment_notes" name="treatment_notes" class="form-control" rows="2"></textarea>
-                                            <?= validation_show_error('treatment_notes', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="outcome" class="form-label">Outcome</label>
-                                            <select id="outcome" name="outcome" class="form-select" required>
-                                                <option value="">Select Outcome</option>
-                                                <option value="Referred">Referred</option>
-                                                <option value="Discharged">Discharged</option>
-                                            </select>
-                                            <?= validation_show_error('outcome', '<div class="text-danger small">', '</div>') ?>
+                                <?php if ($outcome): ?>
+                                    <div class="card mb-2" id="outcome-card-<?= $outcome['outcome_id'] ?>">
+                                        <div class="card-body">
+                                            <strong>Outcome:</strong> <?= esc($outcome['summary']) ?><br>
+                                            <strong>Treatment:</strong> <?= esc($outcome['treatment']) ?>
                                         </div>
                                     </div>
-
-                                    <div class="row gx-3 gy-3">
-                                        <div class="col-md-12" id="addReferralGroup" style="display:none;">
-                                            <label for="referral_reason" class="form-label">Reason for Referral</label>
-                                            <textarea id="referral_reason" name="referral_reason" class="form-control" rows="2"></textarea>
-                                            <?= validation_show_error('referral_reason', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6" id="addDischargeContainer" style="display:none;">
-                                            <label for="addDischargeTime" class="form-label">Discharge Time</label>
-                                            <input id="addDischargeTime" type="datetime-local" name="discharge_time" class="form-control">
-                                            <?= validation_show_error('discharge_time', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6" id="addDischargeConditionGroup" style="display:none;">
-                                            <label for="discharge_condition" class="form-label">Condition at Discharge</label>
-                                            <textarea id="discharge_condition" name="discharge_condition" class="form-control" rows="2"></textarea>
-                                            <?= validation_show_error('discharge_condition', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                    </div>
-
-                                    <!-- Group 5: Follow-Up -->
-                                    <div class="row gx-3 gy-3">
-                                        <div class="col-md-6">
-                                            <label for="return_date" class="form-label">Return Date</label>
-                                            <input id="return_date" type="date" name="return_date" class="form-control">
-                                            <?= validation_show_error('return_date', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="follow_up_notes" class="form-label">Follow-Up Notes</label>
-                                            <textarea id="follow_up_notes" name="follow_up_notes" class="form-control" rows="2"></textarea>
-                                            <?= validation_show_error('follow_up_notes', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary mt-3">Record Outcome</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Visit Details Modal -->
-        <div class="modal fade" id="editVisitDetailsModal" tabindex="-1" aria-labelledby="editVisitDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editVisitDetailsModalLabel">Edit Visit Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <ul class="nav nav-tabs mb-3" role="tablist">
-                            <li class="nav-item">
-                                <button class="nav-link active" id="editPrescriptions-tab" data-bs-toggle="tab" data-bs-target="#editPrescriptions" type="button" role="tab">
-                                    Prescriptions
-                                </button>
-                            </li>
-                            <li class="nav-item">
-                                <button class="nav-link" id="editSupplies-tab" data-bs-toggle="tab" data-bs-target="#editSupplies" type="button" role="tab">
-                                    Supplies Used
-                                </button>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content">
-                            <!-- Prescriptions Tab -->
-                            <div class="tab-pane fade show active" id="editPrescriptions" role="tabpanel">
-                                <form method="post" action="<?= base_url('visits/updateDetails') ?>">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="type" value="prescription">
-                                    <input type="hidden" name="visit_id" id="editPrescriptionVisitId">
-                                    <input type="hidden" name="record_id" id="editPrescriptionId">
-
-                                    <div class="row gx-3 gy-3">
-                                        <div class="col-md-6">
-                                            <label for="editDrugId" class="form-label">Drug</label>
-                                            <select id="editDrugId" name="drug_id" class="form-select" required>
-                                                <?php foreach ($drugs as $drug): ?>
-                                                    <option value="<?= $drug['drug_id'] ?>"><?= esc($drug['name']) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <?= validation_show_error('drug_id', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="editDosage" class="form-label">Dosage</label>
-                                            <input id="editDosage" name="dosage" type="text" class="form-control" required>
-                                            <?= validation_show_error('dosage', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="editDuration" class="form-label">Duration</label>
-                                            <input id="editDuration" name="duration" type="text" class="form-control">
-                                            <?= validation_show_error('duration', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="editQuantity" class="form-label">Quantity</label>
-                                            <input id="editQuantity" name="quantity" type="number" min="1" class="form-control" required>
-                                            <?= validation_show_error('quantity', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="editRoute" class="form-label">Route of Administration</label>
-                                            <select id="editRoute" name="route" class="form-select" required>
-                                                <option value="">Select Route</option>
-                                                <option value="Oral">Oral</option>
-                                                <option value="IV">IV</option>
-                                                <option value="IM">IM</option>
-                                                <option value="Vaginal">Vaginal</option>
-                                                <option value="Topical">Topical</option>
-                                                <option value="Others">Others</option>
-                                            </select>
-                                            <?= validation_show_error('route', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6" id="editOtherRouteGroup" style="display:none;">
-                                            <label for="editOtherRoute" class="form-label">Specify Route</label>
-                                            <input id="editOtherRoute" name="other_route" type="text" class="form-control">
-                                            <?= validation_show_error('other_route', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label for="editInstructions" class="form-label">Instructions</label>
-                                            <textarea id="editInstructions" name="instructions" class="form-control" rows="2"></textarea>
-                                            <?= validation_show_error('instructions', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-success mt-3">Update Prescription</button>
-                                </form>
-                            </div>
-
-                            <!-- Supplies Tab -->
-                            <div class="tab-pane fade" id="editSupplies" role="tabpanel">
-                                <form method="post" action="<?= base_url('visits/updateDetails') ?>">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="type" value="supply">
-                                    <input type="hidden" name="visit_id" id="editSupplyVisitId">
-                                    <input type="hidden" name="record_id" id="editSupplyId">
-
-                                    <div class="row gx-3 gy-3">
-                                        <div class="col-md-6">
-                                            <label for="editSupplySelect" class="form-label">Supply</label>
-                                            <select id="editSupplySelect" name="supply_id" class="form-select" required>
-                                                <?php foreach ($supplies as $supply): ?>
-                                                    <option value="<?= $supply['supply_id'] ?>"><?= esc($supply['name']) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <?= validation_show_error('supply_id', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="editSupplyQty" class="form-label">Quantity Used</label>
-                                            <input id="editSupplyQty" name="quantity_used" type="number" min="1" class="form-control" required>
-                                            <?= validation_show_error('quantity_used', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="editUsageType" class="form-label">Usage Type</label>
-                                            <select id="editUsageType" name="usage_type" class="form-select" required>
-                                                <option value="standard">Standard</option>
-                                                <option value="estimated">Estimated</option>
-                                                <option value="bulk">Bulk</option>
-                                            </select>
-                                            <?= validation_show_error('usage_type', '<div class="text-danger small">', '</div>') ?>
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-success mt-3">Update Supply</button>
-                                </form>
+                                <?php else: ?>
+                                    <?= view('partials/forms/add_outcome_form') ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -765,148 +592,191 @@
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', () => {
+                const getById = id => document.getElementById(id);
+                const queryAll = (selector) => document.querySelectorAll(selector);
 
-                // ---- ADD VISIT LOGIC ----
-                const addCategory = document.getElementById('addVisitCategory');
-                const addAdmCont = document.getElementById('addAdmissionContainer');
+                // 1. Tooltip Initialization
+                queryAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
 
-                function toggleAddFields() {
-                    if (!addCategory || !addAdmCont) return;
-                    addAdmCont.style.display = addCategory.value === 'in-patient' ? 'block' : 'none';
+                // 2. Generic Modal Utility
+                function openModal(modalId) {
+                    document.querySelectorAll('.modal.show').forEach(open => bootstrap.Modal.getInstance(open)?.hide());
+                    const el = getById(modalId);
+                    if (el) {
+                        el.querySelector('.modal-body')?.scrollTo(0, 0);
+                        bootstrap.Modal.getOrCreateInstance(el).show();
+                    }
                 }
 
-                if (addCategory) {
-                    addCategory.addEventListener('change', toggleAddFields);
-                    toggleAddFields();
-                }
+                // 3. Toggle Add Fields for In-Patients
+                const toggleAdmissionVisibility = (selectEl, containerId) => {
+                    const cont = getById(containerId);
+                    if (selectEl && cont) {
+                        cont.style.display = selectEl.value === 'in-patient' ? 'block' : 'none';
+                    }
+                };
+                const addCategory = getById('addVisitCategory');
+                addCategory?.addEventListener('change', () => toggleAdmissionVisibility(addCategory, 'addAdmissionContainer'));
+                toggleAdmissionVisibility(addCategory, 'addAdmissionContainer');
 
-                // ✅ DELETE VISIT LOGIC
-                const deleteVisitIdInput = document.getElementById('deleteVisitId');
-                const deletePatientNameSpan = document.getElementById('deletePatientName');
-
-                document.querySelectorAll('.delete-btn').forEach(btn => {
+                // 4. Delete Visit Setup
+                const deleteVisitId = getById('deleteVisitId');
+                const deletePatientName = getById('deletePatientName');
+                queryAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        const visitId = btn.getAttribute('data-id');
-                        const patientName = btn.getAttribute('data-patient');
-
-                        if (deleteVisitIdInput) deleteVisitIdInput.value = visitId;
-                        if (deletePatientNameSpan) deletePatientNameSpan.textContent = patientName;
-
-                        console.log(`Preparing to delete visit ID: ${visitId} for ${patientName}`);
+                        deleteVisitId.value = btn.dataset.id || '';
+                        deletePatientName.textContent = btn.dataset.patient || 'Unknown';
                     });
                 });
 
-                // ✅ VIEW VISIT LOGIC
-                document.querySelectorAll('.view-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const get = id => document.getElementById(id);
+                // 5. View Visit Details
+                queryAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const url = btn.dataset.fetchUrl;
+                        const fields = [
+                            'patient', 'doctor', 'date', 'category', 'weight', 'bp', 'pulse',
+                            'temp', 'spo2', 'respiration', 'patient_complaints', 'examination_notes',
+                            'investigations', 'diagnosis', 'admission'
+                        ];
 
-                        get('viewPatient').textContent = btn.dataset.patient || '-';
-                        get('viewDoctor').textContent = btn.dataset.doctor || '-';
-                        get('viewDate').textContent = btn.dataset.date || '-';
-                        get('viewWeight').textContent = btn.dataset.weight || '-';
-                        get('viewBP').textContent = btn.dataset.bp || '-';
-                        get('viewPulse').textContent = btn.dataset.pulse || '-';
-                        get('viewTemp').textContent = btn.dataset.temp || '-';
-                        get('viewSpO2').textContent = btn.dataset.spo2 || '-';
-                        get('viewRespiration').textContent = btn.dataset.respiration || '-';
-                        get('viewComplaints').textContent = btn.dataset.patient_complaints || '-';
-                        get('viewExamination').textContent = btn.dataset.examination_notes || '-';
-                        get('viewInvestigations').textContent = btn.dataset.investigations || '-';
-                        get('viewDiagnosis').textContent = btn.dataset.diagnosis || '-';
-                        get('viewCategory').textContent = btn.dataset.category || '-';
-                        get('viewAdmission').textContent = btn.dataset.admission || '-';
-                    });
-                });
+                        fields.forEach(f => {
+                            const el = getById(`u${f.charAt(0).toUpperCase() + f.slice(1)}`);
+                            if (el) el.textContent = btn.dataset[f] || '-';
+                        });
 
-                // ✅ EDIT VISIT LOGIC
-                document.querySelectorAll('.edit-visit-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const get = id => document.getElementById(id);
-                        const visitId = btn.getAttribute('data-id');
-                        const category = btn.dataset.category;
-                        const admission = btn.dataset.admission;
+                        getById('uPrescriptions').innerHTML = '<div class="text-muted">Loading...</div>';
+                        getById('uSupplies').innerHTML = '';
+                        getById('uOutcome').textContent = '';
 
-                        get('editVisitForm').action = `/visits/update/${visitId}`;
-                        get('editVisitId').value = visitId;
-                        get('editPatientId').value = btn.dataset.patient_id;
-                        get('editDoctorId').value = btn.dataset.doctor_id;
-                        get('editVisitDate').value = btn.dataset.date?.split(' ')[0] || '';
-                        get('editWeight').value = btn.dataset.weight || '';
-                        get('editBP').value = btn.dataset.bp || '';
-                        get('editPulse').value = btn.dataset.pulse || '';
-                        get('editTemp').value = btn.dataset.temp || '';
-                        get('editSpO2').value = btn.dataset.spo2 || '';
-                        get('editRespiration').value = btn.dataset.respiration || '';
-                        get('editComplaints').value = btn.dataset.patient_complaints || '';
-                        get('editExamination').value = btn.dataset.examination_notes || '';
-                        get('editInvestigations').value = btn.dataset.investigations || '';
-                        get('editDiagnosis').value = btn.dataset.diagnosis || '';
-                        get('editVisitCategory').value = category;
-
-                        const admissionFields = get('editAdmissionFields');
-                        if (category === 'in-patient') {
-                            admissionFields.style.display = 'flex';
-                            get('editAdmissionTime').value = admission || '';
-                        } else {
-                            admissionFields.style.display = 'none';
-                            get('editAdmissionTime').value = '';
+                        try {
+                            const res = await fetch(url);
+                            const data = await res.json();
+                            getById('uPrescriptions').innerHTML = (data.prescriptions || []).map(p =>
+                                `<li class="list-group-item">${p.drug_name} — ${p.dosage}, ${p.duration} days</li>`
+                            ).join('');
+                            getById('uSupplies').innerHTML = (data.supplies || []).map(s =>
+                                `<li class="list-group-item">${s.supply_name} — ${s.quantity_used} (${s.usage_type})</li>`
+                            ).join('');
+                            const outcome = data.outcome || {};
+                            getById('uOutcome').textContent = outcome.outcome || '-';
+                            getById('uTreatmentNotes').textContent = outcome.treatment_notes || '-';
+                            getById('uDischargeTime').textContent = outcome.discharge_time || '-';
+                            getById('uReferralReason').textContent = outcome.referral_reason || '-';
+                        } catch (err) {
+                            console.error(err);
+                            getById('uPrescriptions').innerHTML = '<li class="text-danger">Error loading data.</li>';
                         }
+
+                        openModal('visitUnifiedModal');
                     });
                 });
 
-                // ✅ Edit Visit Category Toggle
-                const editCategory = document.getElementById('editVisitCategory');
-                const admissionFields = document.getElementById('editAdmissionFields');
+                // 6. Edit Visit Handling
+                queryAll('.edit-visit-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const form = getById('editVisitForm');
+                        const setVal = (id, val) => {
+                            const el = getById(id);
+                            if (el) el.value = val || '';
+                        };
+                        const id = btn.dataset.id;
 
-                if (editCategory && admissionFields) {
-                    editCategory.addEventListener('change', function() {
-                        if (this.value === 'in-patient') {
-                            admissionFields.style.display = 'flex';
+                        form.action = `/visits/update/${id}`;
+                        setVal('editVisitId', id);
+                        setVal('editPatientId', btn.dataset.patient_id);
+                        setVal('editDoctorId', btn.dataset.doctor_id);
+                        setVal('editVisitDate', btn.dataset.date?.split(' ')[0]);
+                        setVal('editWeight', btn.dataset.weight);
+                        setVal('editBP', btn.dataset.bp);
+                        setVal('editPulse', btn.dataset.pulse);
+                        setVal('editTemp', btn.dataset.temp);
+                        setVal('editSpO2', btn.dataset.spo2);
+                        setVal('editRespiration', btn.dataset.respiration);
+                        setVal('editComplaints', btn.dataset.patient_complaints);
+                        setVal('editExamination', btn.dataset.examination_notes);
+                        setVal('editInvestigations', btn.dataset.investigations);
+                        setVal('editDiagnosis', btn.dataset.diagnosis);
+
+                        const cat = btn.dataset.category;
+                        setVal('editVisitCategory', cat);
+                        const admissionGroup = getById('editAdmissionFields');
+                        if (cat === 'in-patient') {
+                            admissionGroup.style.display = 'flex';
+                            setVal('editAdmissionTime', btn.dataset.admission);
                         } else {
-                            admissionFields.style.display = 'none';
-                            document.getElementById('editAdmissionTime').value = '';
+                            admissionGroup.style.display = 'none';
+                            setVal('editAdmissionTime', '');
                         }
-                    });
-                }
 
-                // ✅ OUTCOMES & TREATMENTS MODAL
-                document.querySelectorAll('.edit-details-btn').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const visitId = button.getAttribute('data-visit-id');
-                        const presId = document.getElementById('editPrescriptionVisitId');
-                        const suppId = document.getElementById('editSupplyVisitId');
-                        const recPres = document.getElementById('editPrescriptionId');
-                        const recSupp = document.getElementById('editSupplyId');
-
-                        if (presId) presId.value = visitId;
-                        if (suppId) suppId.value = visitId;
-                        if (recPres) recPres.value = '';
-                        if (recSupp) recSupp.value = '';
-
-                        console.log("Visit ID set in Outcomes & Treatments modal:", visitId);
+                        openModal('editVisitModal');
                     });
                 });
 
-                // ✅ OUTCOME FIELD CONDITIONALS
-                const outcomeSelect = document.getElementById('outcome');
-                const referralGroup = document.getElementById('addReferralGroup');
-                const dischargeContainer = document.getElementById('addDischargeContainer');
-                const dischargeConditionGroup = document.getElementById('addDischargeConditionGroup');
+                // 7. Toggle Edit Admission Fields
+                const catToggle = getById('editVisitCategory');
+                catToggle?.addEventListener('change', () => {
+                    const group = getById('editAdmissionFields');
+                    group.style.display = catToggle.value === 'in-patient' ? 'flex' : 'none';
+                    if (catToggle.value !== 'in-patient') getById('editAdmissionTime').value = '';
+                });
 
-                function toggleOutcomeFields() {
-                    const value = outcomeSelect.value;
-                    referralGroup.style.display = (value === 'Referred') ? 'block' : 'none';
-                    dischargeContainer.style.display = (value === 'Discharged') ? 'block' : 'none';
-                    dischargeConditionGroup.style.display = (value === 'Discharged') ? 'block' : 'none';
-                }
-
+                // 8. Outcome Logic
+                const outcomeSelect = getById('outcome');
                 if (outcomeSelect) {
+                    const referral = getById('addReferralGroup');
+                    const discharge = getById('addDischargeContainer');
+                    const condition = getById('addDischargeConditionGroup');
+
+                    const toggleOutcomeFields = () => {
+                        if (referral) referral.style.display = outcomeSelect.value === 'Referred' ? 'block' : 'none';
+                        if (discharge) discharge.style.display = outcomeSelect.value === 'Discharged' ? 'block' : 'none';
+                        if (condition) condition.style.display = outcomeSelect.value === 'Discharged' ? 'block' : 'none';
+                    };
+
                     outcomeSelect.addEventListener('change', toggleOutcomeFields);
-                    toggleOutcomeFields(); // Run once on load
+                    toggleOutcomeFields();
                 }
 
+                // Attach handler to every button that opens the Visit Details Modal
+                document.querySelectorAll('[data-bs-target="#visitDetailsModal"]').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const visitId = button.getAttribute('data-visit-id');
+                        document.querySelectorAll('.set-visit-id').forEach(input => {
+                            input.value = visitId;
+                        });
+                    });
+                });
+
+                async function refreshCsrfToken() {
+                    try {
+                        const res = await fetch("<?= site_url('getCsrfToken') ?>");
+                        const data = await res.json();
+                        const tokenName = "<?= csrf_token() ?>";
+                        document.querySelectorAll('input[name="' + tokenName + '"]').forEach(el => {
+                            el.value = data.token;
+                        });
+                    } catch (err) {
+                        console.error("Failed to refresh CSRF token", err);
+                    }
+                }
+
+                // Refresh token when modal is shown
+                const modal = document.getElementById('visitDetailsModal');
+                if (modal) {
+                    modal.addEventListener('show.bs.modal', () => {
+                        refreshCsrfToken();
+                    });
+                }
+
+                // 9. Modal Cleanup
+                queryAll('.modal').forEach(modal => {
+                    modal.addEventListener('hidden.bs.modal', () => {
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        queryAll('.modal-backdrop').forEach(el => el.remove());
+                    });
+                });
             });
         </script>
 

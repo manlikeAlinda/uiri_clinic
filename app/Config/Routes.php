@@ -55,3 +55,8 @@ $routes->get('visits',         'VisitController::index');
 $routes->post('visits/store',  'VisitController::store');
 $routes->post('visits/update/(:num)', 'VisitController::update/$1');
 $routes->post('visits/delete', 'VisitController::delete');
+
+$routes->post('visitDetails/addDetails', 'VisitDetailsController::addDetails');
+$routes->get('visits/details/(:num)', 'VisitController::getVisitDetails/$1');
+
+$routes->get('getCsrfToken', 'SecurityController::getToken');

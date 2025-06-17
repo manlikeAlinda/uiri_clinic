@@ -8,6 +8,10 @@ use App\Models\PatientModel;
 use App\Models\DoctorModel;
 use App\Models\DrugModel;
 use App\Models\SupplyModel;
+use App\Models\VisitPrescriptionModel;
+use App\Models\VisitSupplyModel;
+use App\Models\VisitOutcomeModel;
+
 
 use CodeIgniter\API\ResponseTrait;
 
@@ -34,13 +38,17 @@ class VisitController extends BaseController
     public function index()
     {
         $data = [
-            'visits'    => $this->visitModel->getVisitsWithRelations(),
-            'patients'  => $this->patientModel->findAll(),
-            'doctors'   => $this->doctorModel->findAll(),
-            'drugs'     => $this->drugModel->findAll(),     // ✅ Add this
-            'supplies'  => $this->supplyModel->findAll(),   // ✅ And this
-        ];
+            'visits'        => $this->visitModel->getVisitsWithRelations(),
+            'patients'      => $this->patientModel->findAll(),
+            'doctors'       => $this->doctorModel->findAll(),
+            'drugs'         => $this->drugModel->findAll(),
+            'supplies'      => $this->supplyModel->findAll(),
 
+            // ✅ Correct these to match your view file
+            'prescriptions' => [],
+            'supplies_used' => [],
+            'outcome'  => null
+        ];
         return view('manage_visits', $data);
     }
 
@@ -110,7 +118,7 @@ class VisitController extends BaseController
 
     private function validationRules(bool $update = false): array
     {
-        $rules = [
+        return [
             'patient_id'         => 'required|is_natural_no_zero',
             'doctor_id'          => 'required|is_natural_no_zero',
             'visit_date'         => 'required|valid_date',
@@ -127,12 +135,6 @@ class VisitController extends BaseController
             'investigations'     => 'permit_empty|string',
             'diagnosis'          => 'required|string',
         ];
-
-        if ($update) {
-            unset($rules['patient_id'], $rules['doctor_id']);
-        }
-
-        return $rules;
     }
 
     private function collectVisitData(): array
@@ -154,5 +156,52 @@ class VisitController extends BaseController
             'investigations'     => $this->request->getPost('investigations'),
             'diagnosis'          => $this->request->getPost('diagnosis'),
         ];
+    }
+
+    public function getVisitDetails($visit_id)
+    {
+        // Validate that visit_id is a digit
+        if (!ctype_digit($visit_id)) {
+            return $this->response->setJSON(['error' => 'Invalid visit ID'])->setStatusCode(400);
+        }
+
+        // Fetch visit basic info
+        $visit = $this->visitModel
+            ->select("visits.*, CONCAT(patients.first_name, ' ', patients.last_name) AS patient_name, CONCAT(doctors.first_name, ' ', doctors.last_name) AS doctor_name")
+            ->join('patients', 'patients.patient_id = visits.patient_id')
+            ->join('doctors', 'doctors.doctor_id = visits.doctor_id')
+            ->where('visit_id', $visit_id)
+            ->first();
+
+
+        if (!$visit) {
+            return $this->response->setJSON(['error' => 'Visit not found'])->setStatusCode(404);
+        }
+
+        // Prescriptions
+        $prescriptions = (new \App\Models\VisitPrescriptionModel())
+            ->select('visit_prescriptions.*, drugs.name as drug_name')
+            ->join('drugs', 'drugs.drug_id = visit_prescriptions.drug_id')
+            ->where('visit_id', $visit_id)
+            ->findAll();
+
+        // Supplies
+        $supplies = (new \App\Models\VisitSupplyModel())
+            ->select('visit_supplies.*, supplies.name as supply_name')
+            ->join('supplies', 'supplies.supply_id = visit_supplies.supply_id')
+            ->where('visit_id', $visit_id)
+            ->findAll();
+
+        // Outcome
+        $outcome = (new \App\Models\VisitOutcomeModel())
+            ->where('visit_id', $visit_id)
+            ->first();
+
+        return $this->response->setJSON([
+            'visit'         => $visit,
+            'prescriptions' => $prescriptions,
+            'supplies'      => $supplies,
+            'outcome'       => $outcome
+        ]);
     }
 }
