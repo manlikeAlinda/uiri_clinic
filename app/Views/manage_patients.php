@@ -6,7 +6,45 @@
 
 <main class="dashboard-main">
     <?= view('partials/topbar') ?>
+    <style>
+        .page-chip {
+            background: var(--bs-light);
+            border-radius: 999px;
+            padding: .35rem .75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-weight: 600;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .04) inset;
+        }
 
+        .page-chip .current {
+            color: var(--bs-success);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .page-chip .total,
+        .page-chip .slash {
+            color: #6c757d;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .page-nav .btn-icon {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            padding: 0;
+        }
+
+        .page-nav .btn-icon.disabled,
+        .page-nav .btn-icon:disabled {
+            pointer-events: none;
+            opacity: .5;
+        }
+    </style>
     <div class="dashboard-main-body">
 
         <!-- Breadcrumb -->
@@ -32,15 +70,15 @@
             </div>
         <?php endif; ?>
 
-        <!-- Patients Table -->
-        <div class="card basic-data-table">
+        <!-- Patients Table (single card: header + body + footer) -->
+        <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Patients List</h5>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">+ New Patient</button>
             </div>
 
-            <div class="card-body">
-                <table class="table bordered-table mb-0" id="dataTable" data-page-length='10'>
+            <div class="card-body p-0">
+                <table class="table bordered-table mb-0">
                     <thead>
                         <tr>
                             <th>First Name</th>
@@ -65,11 +103,8 @@
                                 <td><?= esc($patient['next_of_kin_relationship']) ?></td>
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
-                                        <button type="button"
-                                            class="w-32-px h-32-px btn btn-info rounded-circle d-inline-flex align-items-center justify-content-center view-btn"
-                                            title="View Patient"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#viewPatientModal"
+                                        <button type="button" class="w-32-px h-32-px btn btn-info rounded-circle d-inline-flex align-items-center justify-content-center view-btn"
+                                            title="View Patient" data-bs-toggle="modal" data-bs-target="#viewPatientModal"
                                             data-id="<?= $patient['patient_id'] ?>"
                                             data-first_name="<?= esc($patient['first_name']) ?>"
                                             data-last_name="<?= esc($patient['last_name']) ?>"
@@ -81,11 +116,8 @@
                                             <iconify-icon icon="mdi:eye-outline" class="text-white text-lg"></iconify-icon>
                                         </button>
 
-                                        <button type="button"
-                                            class="w-32-px h-32-px btn btn-success rounded-circle d-inline-flex align-items-center justify-content-center edit-btn"
-                                            title="Edit Patient"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editPatientModal"
+                                        <button type="button" class="w-32-px h-32-px btn btn-success rounded-circle d-inline-flex align-items-center justify-content-center edit-btn"
+                                            title="Edit Patient" data-bs-toggle="modal" data-bs-target="#editPatientModal"
                                             data-id="<?= $patient['patient_id'] ?>"
                                             data-first_name="<?= esc($patient['first_name']) ?>"
                                             data-last_name="<?= esc($patient['last_name']) ?>"
@@ -97,11 +129,8 @@
                                             <iconify-icon icon="mdi:pencil-outline" class="text-white text-lg"></iconify-icon>
                                         </button>
 
-                                        <button type="button"
-                                            class="w-32-px h-32-px btn btn-danger rounded-circle d-inline-flex align-items-center justify-content-center delete-btn"
-                                            title="Delete Patient"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deletePatientModal"
+                                        <button type="button" class="w-32-px h-32-px btn btn-danger rounded-circle d-inline-flex align-items-center justify-content-center delete-btn"
+                                            title="Delete Patient" data-bs-toggle="modal" data-bs-target="#deletePatientModal"
                                             data-id="<?= $patient['patient_id'] ?>">
                                             <iconify-icon icon="mingcute:delete-2-line" class="text-white text-lg"></iconify-icon>
                                         </button>
@@ -111,8 +140,87 @@
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+                <?php
+                // ------- Pager (robust) -------
+                $rq     = \Config\Services::request();
+                $group  = 'patients';
+
+                // Prefer method access (works across CI4 versions)
+                $current   = (int)($pager->getCurrentPage($group) ?? 1);
+                $pageCount = (int)($pager->getPageCount($group) ?? 1);
+                $perPage   = (int)($rq->getGet('per_page') ?? ($pager->getPerPage($group) ?? 10));
+
+                $hasPrev = $current > 1;
+                $hasNext = $current < max(1, $pageCount);
+
+                // Build a query string that preserves filters & per_page,
+                // but drop CI's internal page params so we don't duplicate them.
+                $keep = $rq->getGet();
+                unset($keep['page'], $keep['page_' . $group]); // e.g. page_patients
+                $keep['per_page'] = $perPage;
+                $qs = http_build_query($keep);
+
+                // Helper to add our preserved query string to pager-generated URIs
+                $withQuery = static function (?string $uri, string $qs) {
+                    if (!$uri) return '#';
+                    return strpos($uri, '?') !== false ? "$uri&$qs" : "$uri?$qs";
+                };
+
+                $prevBase = $pager->getPreviousPageURI($group);
+                $nextBase = $pager->getNextPageURI($group);
+
+                $prevUri = $hasPrev ? $withQuery($prevBase, $qs) : '#';
+                $nextUri = $hasNext ? $withQuery($nextBase, $qs) : '#';
+
+                // Counter like 01 / 12
+                $pad = strlen((string)max(1, $pageCount));
+                $fmt = static fn($n) => str_pad((string)$n, $pad, '0', STR_PAD_LEFT);
+                ?>
+
+                <div class="card-footer d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <!-- Chip counter -->
+                    <div class="page-chip">
+                        <span class="current"><?= $fmt($current) ?></span>
+                        <span class="slash">/</span>
+                        <span class="total"><?= $fmt($pageCount) ?></span>
+                    </div>
+
+                    <!-- Prev / Next -->
+                    <nav class="page-nav d-flex align-items-center gap-2" aria-label="Patients pagination">
+                        <a class="btn btn-light btn-icon<?= $hasPrev ? '' : ' disabled' ?>"
+                            href="<?= esc($prevUri) ?>"
+                            <?= $hasPrev ? 'rel="prev"' : 'aria-disabled="true" tabindex="-1"' ?>
+                            aria-label="Previous page"><span aria-hidden="true">&lsaquo;</span></a>
+
+                        <a class="btn btn-light btn-icon<?= $hasNext ? '' : ' disabled' ?>"
+                            href="<?= esc($nextUri) ?>"
+                            <?= $hasNext ? 'rel="next"' : 'aria-disabled="true" tabindex="-1"' ?>
+                            aria-label="Next page"><span aria-hidden="true">&rsaquo;</span></a>
+                    </nav>
+
+                    <!-- Rows per page -->
+                    <form method="get" class="d-flex align-items-center gap-2 ms-auto">
+                        <?php
+                        // Preserve filters but reset pager internals for a clean jump to page 1
+                        $skip = ['per_page', 'page', 'page_' . $group];
+                        foreach ($rq->getGet() as $k => $v) {
+                            if (in_array($k, $skip, true)) continue;
+                            $val = is_array($v) ? implode(',', $v) : $v;
+                            echo '<input type="hidden" name="' . esc($k) . '" value="' . esc($val) . '">';
+                        }
+                        ?>
+                        <label class="text-muted small">Rows</label>
+                        <select name="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <?php foreach ([10, 25, 50, 100] as $opt): ?>
+                                <option value="<?= $opt ?>" <?= ($perPage === $opt) ? 'selected' : '' ?>><?= $opt ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+
             </div>
         </div>
+
 
         <!-- Add Patient Modal -->
         <!-- Add Patient Modal -->

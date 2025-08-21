@@ -15,10 +15,21 @@ class PatientController extends BaseController
 
     public function index()
     {
-        $patients = $this->patientModel->findAll();
+        $allowed = [10, 25, 50, 100];
+        $perPage = (int)($this->request->getGet('per_page') ?? 10);
+        if (! in_array($perPage, $allowed, true)) {
+            $perPage = 10;
+        }
+
+        $patients = $this->patientModel
+            ->orderBy('last_name', 'asc')
+            ->paginate($perPage, 'patients');
+
         return view('manage_patients', [
             'patients' => $patients,
-            'title'    => 'Manage Patients'
+            'pager'    => $this->patientModel->pager,
+            'title'    => 'Manage Patients',
+            'perPage'  => $perPage,
         ]);
     }
 
@@ -27,12 +38,11 @@ class PatientController extends BaseController
         $validation = \Config\Services::validation();
 
         $data = [
-            'first_name'               => $this->request->getPost('first_name'),
-            'last_name'                => $this->request->getPost('last_name'),
+            'first_name'               => trim((string) $this->request->getPost('first_name')),
+            'last_name'                => trim((string) $this->request->getPost('last_name')),
             'date_of_birth'            => $this->request->getPost('date_of_birth'),
             'gender'                   => $this->request->getPost('gender'),
             'contact_info'             => $this->request->getPost('contact_info'),
-            // 'weight'               => $this->request->getPost('weight'), // remove if unused
             'medical_history'          => $this->request->getPost('medical_history'),
             'next_of_kin_contact'      => $this->request->getPost('next_of_kin_contact'),
             'next_of_kin_relationship' => $this->request->getPost('next_of_kin_relationship'),
@@ -41,24 +51,20 @@ class PatientController extends BaseController
         $rules = [
             'first_name'               => 'required',
             'last_name'                => 'required',
-            'date_of_birth'            => 'required',
-            'gender'                   => 'required',
-            'contact_info'             => 'permit_empty',
-            //'weight'                 => 'permit_empty|decimal',
+            'date_of_birth'            => 'required|valid_date',
+            'gender'                   => 'required|in_list[Male,Female]',
             'medical_history'          => 'permit_empty',
+            'contact_info'             => 'permit_empty',
             'next_of_kin_contact'      => 'permit_empty',
             'next_of_kin_relationship' => 'required|in_list[Spouse,Child,Parent,Sibling,Guardian]',
         ];
 
         if (! $validation->setRules($rules)->run($data)) {
-            return redirect()->back()
-                ->withInput()
-                ->with('errors', $validation->getErrors());
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
         $this->patientModel->save($data);
-        return redirect()->to('/patients')
-            ->with('success', 'Patient added successfully.');
+        return redirect()->to('/patients')->with('success', 'Patient added successfully.');
     }
 
     public function update()
@@ -66,8 +72,8 @@ class PatientController extends BaseController
         $id = $this->request->getPost('patient_id');
 
         $data = [
-            'first_name'               => $this->request->getPost('first_name'),
-            'last_name'                => $this->request->getPost('last_name'),
+            'first_name'               => trim((string) $this->request->getPost('first_name')),
+            'last_name'                => trim((string) $this->request->getPost('last_name')),
             'date_of_birth'            => $this->request->getPost('date_of_birth'),
             'gender'                   => $this->request->getPost('gender'),
             'contact_info'             => $this->request->getPost('contact_info'),
@@ -76,18 +82,27 @@ class PatientController extends BaseController
             'next_of_kin_relationship' => $this->request->getPost('next_of_kin_relationship'),
         ];
 
-        // you can add validation here too if you like...
+        $rules = [
+            'first_name'               => 'required',
+            'last_name'                => 'required',
+            'date_of_birth'            => 'required|valid_date',
+            'gender'                   => 'required|in_list[Male,Female]',
+            'next_of_kin_relationship' => 'required|in_list[Spouse,Child,Parent,Sibling,Guardian]',
+        ];
+
+        $validation = \Config\Services::validation();
+        if (! $validation->setRules($rules)->run($data)) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
 
         $this->patientModel->update($id, $data);
-        return redirect()->to('/patients')
-            ->with('success', 'Patient updated successfully.');
+        return redirect()->to('/patients')->with('success', 'Patient updated successfully.');
     }
 
     public function delete()
     {
         $id = $this->request->getPost('patient_id');
         $this->patientModel->delete($id);
-        return redirect()->to('/patients')
-            ->with('success', 'Patient deleted successfully.');
+        return redirect()->to('/patients')->with('success', 'Patient deleted successfully.');
     }
 }

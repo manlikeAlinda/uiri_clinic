@@ -1,112 +1,120 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\VisitModel;
-use App\Models\TreatmentPlanModel;
-use App\Models\DrugPrescriptionModel;
-use App\Models\DrugModel;
-use App\Models\EquipmentUsageModel;
-use App\Models\SupplyUsageModel;
-use App\Models\PatientModel;
+
+// use App\Models\VisitModel;
+// use App\Models\DrugModel;
+use Config\Database;
 
 class DashboardController extends BaseController
 {
     public function index()
     {
-        $doctor_id = session()->get('doctor_id') ?? 1; // Default to doctor 1 for mock
+        $db   = Database::connect();
+        $req  = service('request');
+        $period = $req->getGet('period') ?? 'month'; // 'week' or 'month'
 
-        // FAKE STUB LOGIC: Replace with real query builders in your models
+        // --------- 1. No. of admissions ----------
+        $admissions = (int) $db->table('visits')
+            ->where('admission_time IS NOT NULL', null, false)
+            ->countAllResults();
 
-        // 1. Today's Scheduled Visits
-        $scheduledVisitsToday = 3;
+        // --------- 2. No. of conditions diagnosed (total) ----------
+        $conditionsTotal = (int) $db->table('visits')
+            ->where('diagnosis IS NOT NULL', null, false)
+            ->where("diagnosis <> ''", null, false)
+            ->countAllResults();
 
-        // 2. In Progress Cases
-        $inProgressCases = 2;
+        // --------- 2b. Conditions diagnosed per period (week/month) ----------
+        if ($period === 'week') {
+            $condRows = $db->query("
+                SELECT YEARWEEK(visit_date, 1) AS grp,
+                       CONCAT('W', WEEK(visit_date, 1), ' ', DATE_FORMAT(visit_date,'%b')) AS label,
+                       COUNT(*) AS c
+                FROM visits
+                WHERE diagnosis IS NOT NULL AND diagnosis <> ''
+                GROUP BY grp, label
+                ORDER BY grp ASC
+            ")->getResultArray();
+        } else {
+            $condRows = $db->query("
+                SELECT DATE_FORMAT(visit_date,'%Y-%m') AS grp,
+                       DATE_FORMAT(visit_date,'%b %y')   AS label,
+                       COUNT(*) AS c
+                FROM visits
+                WHERE diagnosis IS NOT NULL AND diagnosis <> ''
+                GROUP BY grp, label
+                ORDER BY grp ASC
+            ")->getResultArray();
+        }
+        $conditionsPerPeriod = array_values($condRows); // keep as [{label,c},...]
 
-        // 3. Recently Completed Visits
-        $recentCompletedVisits = [
-            ['patient' => 'John Doe', 'date' => '2024-05-25', 'diagnosis' => 'Flu', 'notes' => 'Prescribed rest.'],
-            ['patient' => 'Alice Smith', 'date' => '2024-05-24', 'diagnosis' => 'Malaria', 'notes' => 'Antimalarial course.'],
-            ['patient' => 'Mark Bright', 'date' => '2024-05-22', 'diagnosis' => 'Allergy', 'notes' => 'Administered antihistamines.'],
+        // --------- 3. No. of out-patients ----------
+        $outpatients = (int) $db->table('visits')
+            ->where('visit_category', 'out-patient')
+            ->countAllResults();
+
+        // --------- 4. Drugs inventory summary ----------
+        $inv = $db->table('drugs')
+            ->select('COUNT(*) AS items, SUM(quantity_in_stock) AS qty', false)
+            ->get()->getRow();
+        $inventory = [
+            'items' => (int) ($inv->items ?? 0),
+            'qty'   => (int) ($inv->qty   ?? 0),
         ];
 
-        // 4. Active Patients Under Care
-        $activePatients = 7;
+        // --------- 5. No. of patients referred ----------
+        $referred = (int) $db->table('visit_outcomes')
+            ->where('outcome', 'Referred')
+            ->countAllResults();
 
-        // 5. Prescriptions Breakdown
-        $prescriptionTotal = 42;
-        $prescriptionBreakdown = [
-            ['drug' => 'Paracetamol', 'count' => 15],
-            ['drug' => 'Amoxicillin', 'count' => 10],
-            ['drug' => 'Ibuprofen', 'count' => 7],
-            ['drug' => 'Vitamin C', 'count' => 5],
-            ['drug' => 'Omeprazole', 'count' => 5],
-        ];
+        // --------- 6. Total admissions + outpatients ----------
+        $totalAdmitOut = $admissions + $outpatients;
 
-        // 6. Recent Diagnoses
-        $recentDiagnoses = [
-            ['diagnosis' => 'Typhoid', 'notes' => 'Prescribed Ciprofloxacin'],
-            ['diagnosis' => 'Flu', 'notes' => 'Rest and fluids'],
-            ['diagnosis' => 'Asthma', 'notes' => 'Inhaler issued'],
-            ['diagnosis' => 'Headache', 'notes' => 'Painkillers recommended'],
-            ['diagnosis' => 'Allergy', 'notes' => 'Monitored reaction'],
-        ];
+        // --------- 7. Most observed conditions (Top 10) ----------
+        $topConditions = $db->table('visits')
+            ->select('diagnosis, COUNT(*) AS c')
+            ->where('diagnosis IS NOT NULL', null, false)
+            ->where("diagnosis <> ''", null, false)
+            ->groupBy('diagnosis')
+            ->orderBy('c', 'DESC')
+            ->limit(10)
+            ->get()->getResultArray();
 
-        // 7. Drugs in Stock (Most used)
-        $topDrugs = [
-            ['name' => 'Paracetamol', 'stock' => 120],
-            ['name' => 'Amoxicillin', 'stock' => 90],
-            ['name' => 'Ibuprofen', 'stock' => 60],
-            ['name' => 'Cetrizine', 'stock' => 45],
-            ['name' => 'Vitamin C', 'stock' => 30],
-        ];
+        // --------- 8. Patients per month (last 12) ----------
+        $patientsPerMonth = $db->table('visits')
+            ->select("DATE_FORMAT(visit_date,'%b %y') AS label, COUNT(*) AS c", false)
+            ->where('visit_date >=', date('Y-m-d', strtotime('-12 months')))
+            ->groupBy('label')
+            ->orderBy("MIN(visit_date)", 'ASC', false)
+            ->get()->getResultArray();
 
-        // 8. Equipment Used
-        $equipmentUsed = [
-            ['name' => 'Stethoscope', 'used' => 12],
-            ['name' => 'Thermometer', 'used' => 9],
-            ['name' => 'Blood Pressure Monitor', 'used' => 5],
-        ];
+        // Patients per month split (Admissions vs Outpatients)
+        $patientsByMonth = $db->table('visits')
+            ->select("DATE_FORMAT(visit_date,'%Y-%m') ym,
+              DATE_FORMAT(visit_date,'%b')  label,
+              SUM(visit_category='in-patient')  AS admits,
+              SUM(visit_category='out-patient') AS outs", false)
+            ->where('visit_date >=', date('Y-m-01', strtotime('-11 months')))
+            ->groupBy('ym, label')
+            ->orderBy('ym', 'ASC')
+            ->get()->getResultArray();
 
-        // 9. Supply Usage (Pie Chart)
-        $supplyUsage = [
-            ['name' => 'Gloves', 'used' => 100],
-            ['name' => 'Syringes', 'used' => 80],
-            ['name' => 'Cotton', 'used' => 50],
-        ];
+        $dataForView['patientsByMonth'] = $patientsByMonth;
 
-        // 10. Chart Data
-        $visitStatusChart = [
-            'Scheduled' => 5,
-            'In Progress' => 2,
-            'Completed' => 8
-        ];
 
-        $patientsOverTime = [
-            'labels' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            'data' => [2, 3, 5, 4, 6, 2, 1]
-        ];
-
-        $visitTypes = [
-            'Follow-up' => 6,
-            'Emergency' => 4,
-            'Routine Check' => 5
-        ];
-
-        return view('dashboard/index', [
-            'scheduledVisitsToday' => $scheduledVisitsToday,
-            'inProgressCases' => $inProgressCases,
-            'recentCompletedVisits' => $recentCompletedVisits,
-            'activePatients' => $activePatients,
-            'prescriptionTotal' => $prescriptionTotal,
-            'prescriptionBreakdown' => $prescriptionBreakdown,
-            'recentDiagnoses' => $recentDiagnoses,
-            'topDrugs' => $topDrugs,
-            'equipmentUsed' => $equipmentUsed,
-            'supplyUsage' => $supplyUsage,
-            'visitStatusChart' => $visitStatusChart,
-            'patientsOverTime' => $patientsOverTime,
-            'visitTypes' => $visitTypes,
+        return view('dashboard', [
+            'admissions'          => $admissions,
+            'conditionsTotal'     => $conditionsTotal,
+            'conditionsPerPeriod' => $conditionsPerPeriod,
+            'outpatients'         => $outpatients,
+            'inventory'           => $inventory,
+            'referred'            => $referred,
+            'totalAdmitOut'       => $totalAdmitOut,
+            'topConditions'       => $topConditions,
+            'patientsPerMonth'    => $patientsPerMonth,
+            'patientsByMonth'     => $patientsByMonth,   // ← ADD THIS
+            'period'              => $period,
         ]);
     }
 }

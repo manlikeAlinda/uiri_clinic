@@ -1,7 +1,7 @@
 <form method="post" action="<?= base_url('visitDetails/addDetails') ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="type" value="supply">
-    <input type="hidden" name="visit_id" value="<?= request()->getPost('visit_id') ?? '' ?>">
+    <input type="hidden" name="visit_id" class="set-visit-id" value="<?= request()->getPost('visit_id') ?? '' ?>">
     <div class="row g-3">
         <div class="col-md-6">
             <label>Supply</label>
@@ -11,7 +11,10 @@
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-md-6"><label>Quantity Used</label><input name="quantity_used" type="number" class="form-control" required></div>
+        <div class="col-md-6">
+            <label>Quantity Used</label>
+            <input name="quantity_used" type="number" class="form-control" required>
+        </div>
         <div class="col-md-6">
             <label>Usage Type</label>
             <select name="usage_type" class="form-select" required>

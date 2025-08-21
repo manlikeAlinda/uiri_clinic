@@ -35,9 +35,9 @@
             </li>
 
             <!-- <li>
-                <a href="<?= base_url('equipment') ?>">
-                    <iconify-icon icon="mdi:medical-bag" class="menu-icon"></iconify-icon>
-                    <span>Manage Equipment</span>
+                <a href="<?= base_url('reports') ?>">
+                    <iconify-icon icon="mdi:file-chart-outline" class="menu-icon"></iconify-icon>
+                    <span>Reports</span>
                 </a>
             </li> -->
 

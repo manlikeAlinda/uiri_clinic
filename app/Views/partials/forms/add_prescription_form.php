@@ -12,7 +12,7 @@
                     <option value="<?= $drug['drug_id'] ?>"><?= esc($drug['name']) ?></option>
                 <?php endforeach; ?>
             </select>
-            <?= validation_show_error('drug_id', '<div class="text-danger small">', '</div>') ?>
+            <?= validation_show_error('drug_id', '_errors/_custom_error') ?>
         </div>
 
         <div class="col-md-6">
@@ -69,4 +69,14 @@
         const other = document.getElementById('addOtherRouteGroup');
         other.style.display = (this.value === 'Others') ? 'block' : 'none';
     });
+
+    document.querySelectorAll('.edit-details-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const visitId = this.dataset.visitId;
+        document.querySelectorAll('.set-visit-id').forEach(input => {
+            input.value = visitId;
+        });
+    });
+});
+
 </script>

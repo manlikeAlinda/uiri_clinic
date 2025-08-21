@@ -32,7 +32,6 @@
         <div class="card basic-data-table">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Doctor Records</h5>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDoctorModal">+ New Doctor</button>
             </div>
             <div class="card-body">
                 <table class="table bordered-table mb-0" id="dataTable" data-page-length='10'>

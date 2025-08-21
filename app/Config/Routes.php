@@ -9,11 +9,11 @@ $routes->get('/', function () {
     if (!session()->get('is_logged_in')) {
         return redirect()->to('/login');
     }
-    return view('dashboard', ['title' => 'UIRI CLINIC MANAGEMENT SYSTEM']);
+    return redirect()->to('/dashboard');
 });
 
 
-$routes->get('dashboard', 'Home::index');
+$routes->get('dashboard', 'DashboardController::index');
 // Auth
 $routes->get('login', 'Login::index');
 $routes->post('login/authenticate', 'Login::authenticate');
@@ -39,12 +39,16 @@ $routes->get('supplies', 'SupplyController::index');
 $routes->post('supplies/store', 'SupplyController::store');
 $routes->post('supplies/update', 'SupplyController::update');
 $routes->post('supplies/delete', 'SupplyController::delete');
+$routes->get('supplies/report', 'SupplyController::generalReport');
 
 // Drug Routes
 $routes->get('drugs', 'DrugController::index');
 $routes->post('drugs/store', 'DrugController::store');
 $routes->post('drugs/update', 'DrugController::update');
 $routes->post('drugs/delete', 'DrugController::delete');
+// app/Config/Routes.php
+$routes->get('drugs/report', 'DrugController::generalReport');
+
 
 $routes->get('patients', 'PatientController::index');
 $routes->post('patients/store', 'PatientController::store');
@@ -58,5 +62,21 @@ $routes->post('visits/delete', 'VisitController::delete');
 
 $routes->post('visitDetails/addDetails', 'VisitDetailsController::addDetails');
 $routes->get('visits/details/(:num)', 'VisitController::getVisitDetails/$1');
+$routes->post('visitDetails/updateDetail', 'VisitDetailsController::updateDetail');
+$routes->get('visits/fetchEditDetails/(:num)', 'VisitDetailsController::fetchEditDetails/$1');
+
+// User Management
+$routes->get('users',          'UserController::index');
+$routes->get('users/create',   'UserController::create');   // if you have a separate “new user” form
+$routes->post('users/store',    'UserController::store');
+$routes->post('users/update',   'UserController::update');
+$routes->post('users/delete',   'UserController::delete');
+
+
+// app/Config/Routes.php
+$routes->get('reports', 'ReportsController::index');
+$routes->get('reports/export/csv', 'ReportsController::exportCsv'); // optional export
+
+
 
 $routes->get('getCsrfToken', 'SecurityController::getToken');
