@@ -203,136 +203,139 @@
       </div>
 
 
-      <!-- Table -->
-      <div class="card basic-data-table mb-5">
+      <!-- Drugs List -->
+      <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="card-title mb-0">Drugs List</h5>
-          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDrugModal">+ New Drug</button>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDrugModal">+ New Drug</button>
         </div>
 
-        <div class="table-responsive p-3">
-          <table class="table bordered-table mb-0" id="dataTable">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Dosage</th>
-                <th class="text-end">Qty</th>
-                <th class="text-end">Reorder</th>
-                <th>Stock</th>
-                <th>Batch No</th>
-                <th>Manufacture</th>
-                <th>Expiry</th>
-                <th>Status / Usability</th>
-                <th class="text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($drugs as $d):
-                $status   = $d['effective_status']  ?? $d['status'];
-                $usable   = (int)($d['effective_usable'] ?? $d['is_usable'] ?? 1);
-                $qty      = (int)$d['quantity_in_stock'];
-                $reorder  = (int)($d['reorder_level'] ?? 0);
-                $pct      = $reorder > 0 ? min(100, (int)round(($qty / max($reorder, 1)) * 100)) : 100;
-                $meterCls = $qty <= 0 ? 'bg-danger' : ($qty <= $reorder ? 'bg-warning' : 'bg-success');
-                $badge = [
-                  'Available'    => 'bg-success',
-                  'Low Stock'    => 'bg-warning text-dark',
-                  'Out of Stock' => 'bg-secondary',
-                  'Expired'      => 'bg-danger',
-                ][$status] ?? 'bg-secondary';
-                $useBadge = $usable ? 'bg-primary' : 'bg-dark';
-              ?>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table bordered-table mb-0 align-middle">
+              <thead>
                 <tr>
-                  <td><?= esc($d['name']) ?></td>
-                  <td><?= esc($d['dosage']) ?></td>
-                  <td class="text-end"><?= $qty ?></td>
-                  <td class="text-end"><?= $reorder ?></td>
-                  <td style="min-width:110px">
-                    <div class="progress" style="height:6px;">
-                      <div class="progress-bar <?= $meterCls ?>" role="progressbar" style="width: <?= $pct ?>%;"></div>
-                    </div>
-                    <small class="text-muted"><?= $qty ?>/<?= $reorder ?: '—' ?></small>
-                  </td>
-                  <td><?= esc($d['batch_no']) ?></td>
-                  <td><?= esc($d['manufacture_date']) ?></td>
-                  <td><?= esc($d['expiration_date']) ?></td>
-                  <td>
-                    <div class="d-flex flex-wrap gap-1">
-                      <span class="badge <?= $badge ?>"><?= esc($status) ?></span>
-                      <span class="badge <?= $useBadge ?>"><?= $usable ? 'Usable' : 'Non-usable' ?></span>
-                    </div>
-                  </td>
-                  <td class="text-center">
-                    <div class="d-inline-flex align-items-center justify-content-center gap-2">
-                      <button type="button" class="btn btn-sm btn-outline-primary edit-btn"
-                        data-bs-toggle="modal" data-bs-target="#editDrugModal"
-                        data-id="<?= esc($d['drug_id']) ?>"
-                        data-name="<?= esc($d['name']) ?>"
-                        data-dosage="<?= esc($d['dosage']) ?>"
-                        data-quantity="<?= esc($d['quantity_in_stock']) ?>"
-                        data-batch="<?= esc($d['batch_no']) ?>"
-                        data-manufacture="<?= esc($d['manufacture_date']) ?>"
-                        data-expiry="<?= esc($d['expiration_date']) ?>"
-                        data-status="<?= esc($d['status']) ?>"
-                        data-usable="<?= (int)($d['is_usable'] ?? 1) ?>"
-                        data-reorder-level="<?= esc($d['reorder_level'] ?? 0) ?>"
-                        data-reorder-quantity="<?= esc($d['reorder_quantity'] ?? '') ?>">
-                        <iconify-icon icon="lucide:pencil"></iconify-icon>
-                      </button>
-
-                      <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
-                        data-bs-toggle="modal" data-bs-target="#deleteDrugModal"
-                        data-id="<?= esc($d['drug_id']) ?>">
-                        <iconify-icon icon="lucide:trash-2"></iconify-icon>
-                      </button>
-                    </div>
-                  </td>
+                  <th>Name</th>
+                  <th>Dosage</th>
+                  <th class="text-end">Qty</th>
+                  <th class="text-end">Reorder</th>
+                  <th>Stock</th>
+                  <th>Batch No</th>
+                  <th>Manufacture</th>
+                  <th>Expiry</th>
+                  <th>Status / Usability</th>
+                  <th style="width:140px">Action</th>
                 </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+              </thead>
 
-          <?php if (isset($pager)): ?>
+              <tbody id="drugsTbody">
+                <?php foreach ($drugs as $d):
+                  $status   = $d['effective_status']  ?? $d['status'];
+                  $usable   = (int)($d['effective_usable'] ?? $d['is_usable'] ?? 1);
+                  $qty      = (int)$d['quantity_in_stock'];
+                  $reorder  = (int)($d['reorder_level'] ?? 0);
+                  $pct      = $reorder > 0 ? min(100, (int)round(($qty / max($reorder, 1)) * 100)) : 100;
+                  $meterCls = $qty <= 0 ? 'bg-danger' : ($qty <= $reorder ? 'bg-warning' : 'bg-success');
+                  $badgeCls = [
+                    'Available'    => 'bg-success',
+                    'Low Stock'    => 'bg-warning text-dark',
+                    'Out of Stock' => 'bg-secondary',
+                    'Expired'      => 'bg-danger',
+                  ][$status] ?? 'bg-secondary';
+                  $useBadgeCls = $usable ? 'bg-primary' : 'bg-dark';
+                ?>
+                  <tr data-id="<?= (int)$d['drug_id'] ?>">
+                    <td><?= esc($d['name']) ?></td>
+                    <td><?= esc($d['dosage']) ?></td>
+                    <td class="text-end"><?= $qty ?></td>
+                    <td class="text-end"><?= $reorder ?></td>
+                    <td style="min-width:110px">
+                      <div class="progress" style="height:6px;">
+                        <div class="progress-bar <?= $meterCls ?>" role="progressbar" style="width: <?= $pct ?>%;"></div>
+                      </div>
+                      <small class="text-muted"><?= $qty ?>/<?= $reorder ?: '—' ?></small>
+                    </td>
+                    <td><?= esc($d['batch_no']) ?></td>
+                    <td><?= esc($d['manufacture_date']) ?></td>
+                    <td><?= esc($d['expiration_date']) ?></td>
+                    <td>
+                      <div class="d-flex flex-wrap gap-1">
+                        <span class="badge <?= $badgeCls ?>"><?= esc($status) ?></span>
+                        <span class="badge <?= $useBadgeCls ?>"><?= $usable ? 'Usable' : 'Non-usable' ?></span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-inline-flex align-items-center justify-content-center gap-2">
+                        <button type="button" class="w-32-px h-32-px btn btn-success rounded-circle d-inline-flex align-items-center justify-content-center edit-btn"
+                          title="Edit Drug"
+                          data-bs-toggle="modal" data-bs-target="#editDrugModal"
+                          data-id="<?= (int)$d['drug_id'] ?>"
+                          data-name="<?= esc($d['name']) ?>"
+                          data-dosage="<?= esc($d['dosage']) ?>"
+                          data-quantity="<?= esc($d['quantity_in_stock']) ?>"
+                          data-batch="<?= esc($d['batch_no']) ?>"
+                          data-manufacture="<?= esc($d['manufacture_date']) ?>"
+                          data-expiry="<?= esc($d['expiration_date']) ?>"
+                          data-status="<?= esc($d['status']) ?>"
+                          data-usable="<?= (int)($d['is_usable'] ?? 1) ?>"
+                          data-reorder-level="<?= esc($d['reorder_level'] ?? 0) ?>"
+                          data-reorder-quantity="<?= esc($d['reorder_quantity'] ?? '') ?>">
+                          <iconify-icon icon="mdi:pencil-outline" class="text-white text-lg"></iconify-icon>
+                        </button>
+
+                        <button type="button" class="w-32-px h-32-px btn btn-danger rounded-circle d-inline-flex align-items-center justify-content-center delete-btn"
+                          title="Delete Drug"
+                          data-bs-toggle="modal" data-bs-target="#deleteDrugModal"
+                          data-id="<?= (int)$d['drug_id'] ?>">
+                          <iconify-icon icon="mingcute:delete-2-line" class="text-white text-lg"></iconify-icon>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+
+          <?php if (isset($pager) && is_object($pager)): ?>
             <?php
-            $rq     = \Config\Services::request();
-            $group  = 'drugs';
-
-            // Robust CI4 pager getters
+            // ---------- Pager (Drugs) ----------
+            $rq        = \Config\Services::request();
+            $group     = 'drugs';
             $current   = (int)($pager->getCurrentPage($group) ?? 1);
             $pageCount = (int)($pager->getPageCount($group) ?? 1);
-            $perPage   = (int)($rq->getGet('per_page') ?? ($pager->getPerPage($group) ?? 10));
+            $perPage   = (int)($pager->getPerPage($group) ?? ($rq->getGet('per_page') ?? 10));
 
-            $hasPrev = $current > 1;
-            $hasNext = $current < max(1, $pageCount);
+            $hasPrev   = $current > 1;
+            $hasNext   = $current < max(1, $pageCount);
 
-            // Keep current filters; reset CI page params; keep per_page
+            // preserve non-paging filters
             $keep = $rq->getGet();
-            unset($keep['page'], $keep['page_' . $group]); // e.g. page_drugs
+            unset($keep['page'], $keep['page_' . $group]);
             $keep['per_page'] = $perPage;
             $qs = http_build_query($keep);
 
             $withQuery = static function (?string $uri, string $qs) {
               if (!$uri) return '#';
-              return strpos($uri, '?') !== false ? "$uri&$qs" : "$uri?$qs";
+              return str_contains($uri, '?') ? "$uri&$qs" : "$uri?$qs";
             };
 
             $prevUri = $hasPrev ? $withQuery($pager->getPreviousPageURI($group), $qs) : '#';
-            $nextUri = $hasNext ? $withQuery($pager->getNextPageURI($group),     $qs) : '#';
+            $nextUri = $hasNext ? $withQuery($pager->getNextPageURI($group), $qs)     : '#';
 
-            // 01 / 12 style counter
-            $pad = strlen((string)max(1, $pageCount));
-            $fmt = static fn($n) => str_pad((string)$n, $pad, '0', STR_PAD_LEFT);
+            $pad    = strlen((string)max(1, $pageCount));
+            $fmtNum = static fn($n) => str_pad((string)$n, $pad, '0', STR_PAD_LEFT);
             ?>
 
             <div class="card-footer d-flex align-items-center justify-content-between flex-wrap gap-3">
-              <!-- Counter -->
+              <!-- counter -->
               <div class="page-chip">
-                <span class="current"><?= $fmt($current) ?></span>
+                <span class="current"><?= $fmtNum($current) ?></span>
                 <span class="slash">/</span>
-                <span class="total"><?= $fmt($pageCount) ?></span>
+                <span class="total"><?= $fmtNum($pageCount) ?></span>
               </div>
 
-              <!-- Prev / Next -->
+              <!-- prev/next -->
               <nav class="page-nav d-flex align-items-center gap-2" aria-label="Drugs pagination">
                 <a class="btn btn-light btn-icon<?= $hasPrev ? '' : ' disabled' ?>"
                   href="<?= esc($prevUri) ?>"
@@ -345,18 +348,16 @@
                   aria-label="Next page"><span aria-hidden="true">&rsaquo;</span></a>
               </nav>
 
-              <!-- Rows per page -->
+              <!-- rows per page -->
               <form method="get" class="d-flex align-items-center gap-2 ms-auto">
                 <?php
-                // Preserve filters, reset CI pager params (so we jump to page 1 cleanly)
-                $skip = ['per_page', 'page', 'page_' . $group];
                 foreach ($rq->getGet() as $k => $v) {
-                  if (in_array($k, $skip, true)) continue;
+                  if (in_array($k, ['per_page', 'page', 'page_' . $group], true)) continue;
                   $val = is_array($v) ? implode(',', $v) : $v;
                   echo '<input type="hidden" name="' . esc($k) . '" value="' . esc($val) . '">';
                 }
                 ?>
-                <label class="text-muted small mb-0">Rows</label>
+                <label class="text-muted small">Rows</label>
                 <select name="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
                   <?php foreach ([10, 25, 50, 100] as $opt): ?>
                     <option value="<?= $opt ?>" <?= ($perPage === $opt) ? 'selected' : '' ?>><?= $opt ?></option>
@@ -365,9 +366,9 @@
               </form>
             </div>
           <?php endif; ?>
-
         </div>
       </div>
+
 
       <!-- Report builder (unchanged aside from the controller’s computed fields) -->
       <div class="card mb-4 shadow-sm d-print-none">

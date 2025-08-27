@@ -19,7 +19,29 @@ class DoctorController extends BaseController
      */
     public function index()
     {
-        $data['doctors'] = $this->doctorModel->findAll();
+        // per-page comes from query (?per_page=25) with a sensible default
+        $perPage = (int) ($this->request->getGet('per_page') ?? 10);
+        $group   = 'doctors'; // must match the view’s pager group
+
+        // Optional: simple search (?q=term) across key columns
+        $q = trim((string) $this->request->getGet('q'));
+        $builder = $this->doctorModel->orderBy('last_name', 'ASC');
+
+        if ($q !== '') {
+            $builder = $builder->groupStart()
+                ->like('first_name', $q)
+                ->orLike('last_name', $q)
+                ->orLike('email', $q)
+                ->orLike('phone_number', $q)
+                ->groupEnd();
+        }
+
+        // Use paginate so $pager is created and reads ?page_doctors=#
+        $data['doctors'] = $builder->paginate($perPage, $group);
+        $data['pager']   = $this->doctorModel->pager; // <<< fix: pass pager
+        $data['perPage'] = $perPage;                  // used by the rows dropdown
+        $data['q']       = $q;                        // keep search term in the UI if you add a search box
+
         return view('manage_doctors', $data);
     }
 

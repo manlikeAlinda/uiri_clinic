@@ -29,59 +29,133 @@
             </div>
         <?php endif; ?>
 
-        <div class="card basic-data-table">
+        <!-- Doctor Records -->
+        <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Doctor Records</h5>
+                <!-- Optional: hook up your add modal if you have it -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDoctorModal">+ New Doctor</button>
             </div>
-            <div class="card-body">
-                <table class="table bordered-table mb-0" id="dataTable" data-page-length='10'>
-                    <thead>
-                        <tr>
-                            <th scope="col">First Name</th>
-                            <th scope="col">Last Name</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Phone Number</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($doctors as $index => $doctor): ?>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table bordered-table mb-0 align-middle">
+                        <thead>
                             <tr>
-
-                                <td><?= esc($doctor['first_name']) ?></td>
-                                <td><?= esc($doctor['last_name']) ?></td>
-                                <td><?= esc($doctor['email']) ?></td>
-                                <td><?= esc($doctor['phone_number']) ?></td>
-                                <td>
-                                    <a href="javascript:void(0)"
-                                        class="w-32-px h-32-px bg-success-focus text-success-main rounded-circle d-inline-flex align-items-center justify-content-center edit-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editDoctorModal"
-                                        data-id="<?= $doctor['doctor_id'] ?>"
-                                        data-first_name="<?= esc($doctor['first_name']) ?>"
-                                        data-last_name="<?= esc($doctor['last_name']) ?>"
-                                        data-email="<?= esc($doctor['email']) ?>"
-                                        data-phone="<?= esc($doctor['phone_number']) ?>">
-                                        <iconify-icon icon="lucide:edit"></iconify-icon>
-                                    </a>
-
-                                    <button
-                                        type="button"
-                                        class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteDoctorModal"
-                                        data-id="<?= $doctor['doctor_id'] ?>">
-                                        <iconify-icon icon="mingcute:delete-2-line"></iconify-icon>
-                                    </button>
-
-
-                                </td>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone Number</th>
+                                <th style="width:140px">Action</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody id="doctorsTbody">
+                            <?php foreach ($doctors as $doctor): ?>
+                                <tr data-id="<?= (int)$doctor['doctor_id'] ?>">
+                                    <td><?= esc($doctor['first_name']) ?></td>
+                                    <td><?= esc($doctor['last_name']) ?></td>
+                                    <td><?= esc($doctor['email']) ?></td>
+                                    <td><?= esc($doctor['phone_number']) ?></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <button type="button"
+                                                class="w-32-px h-32-px btn btn-success rounded-circle d-inline-flex align-items-center justify-content-center js-edit"
+                                                title="Edit Doctor"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editDoctorModal"
+                                                data-id="<?= (int)$doctor['doctor_id'] ?>"
+                                                data-first_name="<?= esc($doctor['first_name']) ?>"
+                                                data-last_name="<?= esc($doctor['last_name']) ?>"
+                                                data-email="<?= esc($doctor['email']) ?>"
+                                                data-phone="<?= esc($doctor['phone_number']) ?>">
+                                                <iconify-icon icon="mdi:pencil-outline" class="text-white text-lg"></iconify-icon>
+                                            </button>
+
+                                            <button type="button"
+                                                class="w-32-px h-32-px btn btn-danger rounded-circle d-inline-flex align-items-center justify-content-center js-delete"
+                                                title="Delete Doctor"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteDoctorModal"
+                                                data-id="<?= (int)$doctor['doctor_id'] ?>">
+                                                <iconify-icon icon="mingcute:delete-2-line" class="text-white text-lg"></iconify-icon>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <?php
+                // ---------- Pager (Doctors) ----------
+                $rq        = \Config\Services::request();
+                $group     = 'doctors';
+                $current   = (int)($pager->getCurrentPage($group) ?? 1);
+                $pageCount = (int)($pager->getPageCount($group) ?? 1);
+                $perPage   = (int)($pager->getPerPage($group) ?? ($rq->getGet('per_page') ?? 10));
+                $hasPrev   = $current > 1;
+                $hasNext   = $current < max(1, $pageCount);
+
+                // preserve non-paging filters
+                $keep = $rq->getGet();
+                unset($keep['page'], $keep['page_' . $group]);
+                $keep['per_page'] = $perPage;
+                $qs = http_build_query($keep);
+
+                $withQuery = static function (?string $uri, string $qs) {
+                    if (!$uri) return '#';
+                    return str_contains($uri, '?') ? "$uri&$qs" : "$uri?$qs";
+                };
+
+                $prevUri = $hasPrev ? $withQuery($pager->getPreviousPageURI($group), $qs) : '#';
+                $nextUri = $hasNext ? $withQuery($pager->getNextPageURI($group), $qs)     : '#';
+
+                $pad    = strlen((string)max(1, $pageCount));
+                $fmtNum = static fn($n) => str_pad((string)$n, $pad, '0', STR_PAD_LEFT);
+                ?>
+
+                <div class="card-footer d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <!-- counter -->
+                    <div class="page-chip">
+                        <span class="current"><?= $fmtNum($current) ?></span>
+                        <span class="slash">/</span>
+                        <span class="total"><?= $fmtNum($pageCount) ?></span>
+                    </div>
+
+                    <!-- prev/next -->
+                    <nav class="page-nav d-flex align-items-center gap-2" aria-label="Doctors pagination">
+                        <a class="btn btn-light btn-icon<?= $hasPrev ? '' : ' disabled' ?>"
+                            href="<?= esc($prevUri) ?>"
+                            <?= $hasPrev ? 'rel="prev"' : 'aria-disabled="true" tabindex="-1"' ?>
+                            aria-label="Previous page"><span aria-hidden="true">&lsaquo;</span></a>
+
+                        <a class="btn btn-light btn-icon<?= $hasNext ? '' : ' disabled' ?>"
+                            href="<?= esc($nextUri) ?>"
+                            <?= $hasNext ? 'rel="next"' : 'aria-disabled="true" tabindex="-1"' ?>
+                            aria-label="Next page"><span aria-hidden="true">&rsaquo;</span></a>
+                    </nav>
+
+                    <!-- rows per page -->
+                    <form method="get" class="d-flex align-items-center gap-2 ms-auto">
+                        <?php
+                        foreach ($rq->getGet() as $k => $v) {
+                            if (in_array($k, ['per_page', 'page', 'page_' . $group], true)) continue;
+                            $val = is_array($v) ? implode(',', $v) : $v;
+                            echo '<input type="hidden" name="' . esc($k) . '" value="' . esc($val) . '">';
+                        }
+                        ?>
+                        <label class="text-muted small">Rows</label>
+                        <select name="per_page" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <?php foreach ([10, 25, 50, 100] as $opt): ?>
+                                <option value="<?= $opt ?>" <?= ($perPage === $opt) ? 'selected' : '' ?>><?= $opt ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
             </div>
         </div>
+
 
         <!-- Add Doctor Modal -->
         <div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
