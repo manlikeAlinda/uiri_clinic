@@ -578,45 +578,135 @@ class VisitController extends BaseController
         }
     }
 
+    // public function delete()
+    // {
+    //     $who = $this->currentDoctorOrRedirect();
+    //     if ($who instanceof RedirectResponse) {
+    //         return $who;
+    //     }
+
+    //     $id = $this->request->getPost('visit_id');
+    //     if (!ctype_digit((string) $id)) {
+    //         return redirect()->to('/visits')->with('error', 'No valid Visit ID provided.');
+    //     }
+
+    //     $existing = $this->visitModel->find((int) $id);
+    //     if (!$existing) {
+    //         return redirect()->to('/visits')->with('error', 'Visit not found.');
+    //     }
+
+    //     if (!$this->canModifyVisit($existing)) {
+    //         return redirect()->to('/visits')->with('error', 'You cannot delete this visit.');
+    //     }
+
+    //     $db = \Config\Database::connect();
+    //     $db->transStart();
+
+    //     try {
+    //         $this->visitModel->delete((int) $id);
+    //         $db->transComplete();
+
+    //         if (!$db->transStatus()) {
+    //             return redirect()->to('/visits')->with('error', 'Could not delete the visit. Please try again.');
+    //         }
+
+    //         return redirect()->to('/visits')->with('success', 'Visit deleted successfully.');
+    //     } catch (\Throwable $e) {
+    //         $db->transRollback();
+    //         log_message('error', 'Visit delete failed: {msg}', ['msg' => $e->getMessage()]);
+    //         return redirect()->to('/visits')->with('error', 'An unexpected error occurred while deleting the visit.');
+    //     }
+    // }
+
     public function delete()
     {
+        // Auth & role checks reused from your controller
         $who = $this->currentDoctorOrRedirect();
-        if ($who instanceof RedirectResponse) {
+        if ($who instanceof \CodeIgniter\HTTP\RedirectResponse) {
             return $who;
         }
 
         $id = $this->request->getPost('visit_id');
         if (!ctype_digit((string) $id)) {
-            return redirect()->to('/visits')->with('error', 'No valid Visit ID provided.');
+            $msg = 'Invalid visit.';
+            return $this->isAjax() ? $this->failValidationError($msg) : redirect()->to('/visits')->with('error', $msg);
         }
+        $visitId = (int) $id;
 
-        $existing = $this->visitModel->find((int) $id);
+        // Ensure visit exists and user can modify
+        $existing = $this->visitModel->find($visitId);
         if (!$existing) {
-            return redirect()->to('/visits')->with('error', 'Visit not found.');
+            $msg = 'Visit not found.';
+            return $this->isAjax() ? $this->failNotFound($msg) : redirect()->to('/visits')->with('error', $msg);
         }
-
         if (!$this->canModifyVisit($existing)) {
-            return redirect()->to('/visits')->with('error', 'You cannot delete this visit.');
+            $msg = 'You cannot delete this visit.';
+            return $this->isAjax() ? $this->failForbidden($msg) : redirect()->to('/visits')->with('error', $msg);
         }
 
         $db = \Config\Database::connect();
-        $db->transStart();
+        $db->transException(true); // throw on failure
 
         try {
-            $this->visitModel->delete((int) $id);
-            $db->transComplete();
+            // 1) Aggregate child usage for this visit (use your actual table names)
+            $presc = $db->table('visit_prescriptions')
+                ->select('drug_id, SUM(quantity) AS qty', false)
+                ->where('visit_id', $visitId)
+                ->groupBy('drug_id')
+                ->get()->getResultArray();
 
-            if (!$db->transStatus()) {
-                return redirect()->to('/visits')->with('error', 'Could not delete the visit. Please try again.');
+            $supps = $db->table('visit_supplies')
+                ->select('supply_id, SUM(quantity_used) AS qty', false)
+                ->where('visit_id', $visitId)
+                ->groupBy('supply_id')
+                ->get()->getResultArray();
+
+            // 2) Reinstate drugs (atomic += to avoid race conditions)
+            foreach ($presc as $row) {
+                $drugId = (int) ($row['drug_id'] ?? 0);
+                $qty    = (int) ($row['qty'] ?? 0);
+                if ($drugId && $qty > 0) {
+                    $db->table('drugs')
+                        ->set('quantity_in_stock', 'quantity_in_stock + ' . $qty, false)
+                        ->where('drug_id', $drugId)
+                        ->update();
+                }
             }
 
-            return redirect()->to('/visits')->with('success', 'Visit deleted successfully.');
+            // 3) Reinstate supplies (atomic +=)
+            foreach ($supps as $row) {
+                $supplyId = (int) ($row['supply_id'] ?? 0);
+                $qty      = (int) ($row['qty'] ?? 0);
+                if ($supplyId && $qty > 0) {
+                    $db->table('supplies')
+                        ->set('quantity_in_stock', 'quantity_in_stock + ' . $qty, false)
+                        ->where('supply_id', $supplyId)
+                        ->update();
+                }
+            }
+
+            // 4) Delete children (skip if you have FK ON DELETE CASCADE on these)
+            $db->table('visit_prescriptions')->where('visit_id', $visitId)->delete();
+            $db->table('visit_supplies')->where('visit_id', $visitId)->delete();
+            $db->table('visit_outcomes')->where('visit_id', $visitId)->delete();
+
+            // 5) Delete the visit
+            $db->table('visits')->where('visit_id', $visitId)->delete();
+
+            $db->transCommit();
+
+            $ok = 'Visit deleted and inventory reinstated.';
+            return $this->isAjax()
+                ? $this->respond(['status' => 'ok', 'message' => $ok])
+                : redirect()->to('/visits')->with('success', $ok);
         } catch (\Throwable $e) {
             $db->transRollback();
-            log_message('error', 'Visit delete failed: {msg}', ['msg' => $e->getMessage()]);
-            return redirect()->to('/visits')->with('error', 'An unexpected error occurred while deleting the visit.');
+            log_message('error', 'Visit delete failed: {err}', ['err' => $e->getMessage()]);
+            $msg = 'Failed to delete visit. No changes were made.';
+            return $this->isAjax() ? $this->failServerError($msg) : redirect()->to('/visits')->with('error', $msg);
         }
     }
+
 
     /* ========================================================================
      * Validation / payload
